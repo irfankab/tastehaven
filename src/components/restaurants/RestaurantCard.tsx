@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Star, MessageSquare, ThumbsUp } from "lucide-react";
+import { Star, MessageSquare, ThumbsUp, Image } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,7 @@ interface Review {
   comment: string;
   date: string;
   likes?: number;
+  image_url?: string;
 }
 
 interface RestaurantCardProps {
@@ -43,6 +44,7 @@ export const RestaurantCard = ({
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [localLikes, setLocalLikes] = useState(likes);
   const [localReviews, setLocalReviews] = useState(reviews);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleLikeRestaurant = () => {
@@ -139,6 +141,35 @@ export const RestaurantCard = ({
                         </div>
                       </div>
                       <p className="text-sm text-gray-600">{review.comment}</p>
+                      {review.image_url && (
+                        <div className="mt-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                className="p-0 h-20 w-20 relative overflow-hidden rounded-md hover:opacity-90"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedImage(review.image_url);
+                                }}
+                              >
+                                <img 
+                                  src={review.image_url} 
+                                  alt="Review" 
+                                  className="w-full h-full object-cover"
+                                />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[600px] p-0">
+                              <img 
+                                src={review.image_url} 
+                                alt="Review" 
+                                className="w-full h-auto"
+                              />
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      )}
                       <p className="text-xs text-gray-400 mt-1">
                         {new Date(review.date).toLocaleDateString()}
                       </p>

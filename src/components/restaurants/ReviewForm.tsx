@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Star } from "lucide-react";
+import { Star, Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ReviewFormProps {
   restaurantId: number;
@@ -14,27 +15,69 @@ export const ReviewForm = ({ restaurantId, restaurantName, onClose }: ReviewForm
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [hoveredStar, setHoveredStar] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Here you would typically send this to your backend
-    const review = {
-      restaurantId,
-      rating,
-      comment,
-      date: new Date().toISOString(),
-    };
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
+  };
 
-    console.log("Submitted review:", review);
-    
-    toast({
-      title: "Review submitted!",
-      description: "Thank you for sharing your experience.",
-    });
-    
-    onClose();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUploading(true);
+
+    try {
+      let imageUrl = null;
+
+      if (selectedImage) {
+        const fileExt = selectedImage.name.split('.').pop();
+        const filePath = `${crypto.randomUUID()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('restaurant-images')
+          .upload(filePath, selectedImage);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('restaurant-images')
+          .getPublicUrl(filePath);
+
+        imageUrl = publicUrl;
+      }
+
+      // Here you would typically send this to your backend
+      const review = {
+        restaurantId,
+        rating,
+        comment,
+        image_url: imageUrl,
+        date: new Date().toISOString(),
+      };
+
+      console.log("Submitted review:", review);
+      
+      toast({
+        title: "Review submitted!",
+        description: "Thank you for sharing your experience.",
+      });
+      
+      onClose();
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -64,12 +107,32 @@ export const ReviewForm = ({ restaurantId, restaurantName, onClose }: ReviewForm
         className="min-h-[100px]"
       />
 
+      <div className="flex items-center gap-4">
+        <input
+          type="file"
+          accept="image/*"
+          id="image-upload"
+          className="hidden"
+          onChange={handleImageSelect}
+        />
+        <label
+          htmlFor="image-upload"
+          className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
+        >
+          <Upload className="w-4 h-4" />
+          {selectedImage ? selectedImage.name : "Add a photo"}
+        </label>
+      </div>
+
       <div className="flex justify-end space-x-2">
-        <Button variant="outline" onClick={onClose}>
+        <Button variant="outline" onClick={onClose} type="button">
           Cancel
         </Button>
-        <Button type="submit" disabled={!rating || !comment}>
-          Submit Review
+        <Button 
+          type="submit" 
+          disabled={!rating || !comment || isUploading}
+        >
+          {isUploading ? "Uploading..." : "Submit Review"}
         </Button>
       </div>
     </form>
