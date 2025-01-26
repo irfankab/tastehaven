@@ -41,19 +41,29 @@ export const AuthForm = ({ defaultMode = 'login' }: AuthFormProps) => {
         toast.success("Logged in successfully!");
         navigate("/");
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { error: signUpError, data } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
               full_name: fullName,
             },
+            emailRedirectTo: `${window.location.origin}/auth`,
           },
         });
 
-        if (error) throw error;
+        if (signUpError) throw signUpError;
 
-        toast.success("Account created successfully! Please check your email to verify your account.");
+        // Automatically sign in after signup
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) throw signInError;
+
+        toast.success("Account created successfully!");
+        navigate("/");
       }
     } catch (error: any) {
       toast.error(error.message);
@@ -66,7 +76,7 @@ export const AuthForm = ({ defaultMode = 'login' }: AuthFormProps) => {
     <Card className="w-full backdrop-blur-sm bg-white/80 border-none shadow-xl">
       <CardHeader>
         <CardTitle className="text-2xl text-center">
-          {isLogin ? "Welcome Back" : "Join REVBD"}
+          {isLogin ? "Welcome Back" : "Join TasteHaven"}
         </CardTitle>
       </CardHeader>
       <CardContent>
