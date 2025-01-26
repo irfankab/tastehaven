@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Star, MessageSquare, ThumbsUp, Image } from "lucide-react";
 import {
@@ -9,6 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ReviewForm } from "./ReviewForm";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface Review {
   id: number;
@@ -21,7 +23,7 @@ interface Review {
 }
 
 interface RestaurantCardProps {
-  id: string; // Changed from number to string to match UUID from Supabase
+  id: string;
   name: string;
   cuisine: string;
   rating: number;
@@ -46,7 +48,23 @@ export const RestaurantCard = ({
   const [localLikes, setLocalLikes] = useState(likes);
   const [localReviews, setLocalReviews] = useState(reviews);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [session, setSession] = useState(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleLikeRestaurant = () => {
     setLocalLikes(prev => prev + 1);
@@ -69,6 +87,21 @@ export const RestaurantCard = ({
       description: "Thanks for your feedback",
     });
   };
+
+  const handleReviewClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!session) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign up or log in to write a review",
+      });
+      navigate('/auth');
+      return;
+    }
+    setIsWritingReview(true);
+  };
+
+  // ... keep existing code (JSX for the restaurant card layout)
 
   return (
     <Card className="overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300">
@@ -178,12 +211,7 @@ export const RestaurantCard = ({
                   ))}
                 </div>
                 <div className="mt-4 flex justify-end">
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsWritingReview(true);
-                    }}
-                  >
+                  <Button onClick={handleReviewClick}>
                     Write a Review
                   </Button>
                 </div>
@@ -241,7 +269,7 @@ export const RestaurantCard = ({
                 ))}
               </div>
               <div className="flex justify-end pt-4 border-t">
-                <Button onClick={() => setIsWritingReview(true)}>
+                <Button onClick={handleReviewClick}>
                   Write a Review
                 </Button>
               </div>
