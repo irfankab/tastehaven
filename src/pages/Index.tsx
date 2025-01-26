@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
-import { SearchBar } from "@/components/restaurants/SearchBar";
+import { Header } from "@/components/layout/Header";
 import { supabase } from "@/integrations/supabase/client";
 
 const MOCK_RESTAURANTS = [
@@ -393,12 +393,10 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -414,69 +412,32 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="relative">
+      <div className="relative">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000')] bg-cover bg-center">
           <div className="absolute inset-0 bg-black/75"></div>
         </div>
         
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center">
-              <h1 className="text-3xl font-bold text-white animate-fade-in tracking-tight">
-                REVBD
-              </h1>
-            </div>
+        <div className="relative z-10">
+          <Header onSearch={setSearchQuery} />
 
-            <div className="flex-1 max-w-2xl mx-8">
-              <SearchBar onSearch={setSearchQuery} />
-            </div>
-
-            <nav className="flex items-center space-x-4">
-              <button className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full">
-                Write a Review
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="py-20 text-center">
+              <h2 className="text-5xl font-bold text-white mb-6 animate-fade-in tracking-tight drop-shadow-lg">
+                Discover Your Next Favorite Spot
+              </h2>
+              <p className="text-xl text-white max-w-2xl mx-auto mb-8 animate-fade-in delay-100 drop-shadow-md">
+                Join our community of food lovers and explore the best dining experiences in your area
+              </p>
+              <button 
+                onClick={() => navigate('/explore')}
+                className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-xl animate-fade-in delay-200"
+              >
+                Start Exploring
               </button>
-              {!session ? (
-                <>
-                  <Link 
-                    to="/auth" 
-                    className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full"
-                  >
-                    Log In
-                  </Link>
-                  <Link 
-                    to="/auth?mode=signup" 
-                    className="bg-primary text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg"
-                  >
-                    Sign Up
-                  </Link>
-                </>
-              ) : (
-                <button 
-                  onClick={() => supabase.auth.signOut()} 
-                  className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full"
-                >
-                  Sign Out
-                </button>
-              )}
-            </nav>
-          </div>
-
-          <div className="py-20 text-center">
-            <h2 className="text-5xl font-bold text-white mb-6 animate-fade-in tracking-tight drop-shadow-lg">
-              Discover Your Next Favorite Spot
-            </h2>
-            <p className="text-xl text-white max-w-2xl mx-auto mb-8 animate-fade-in delay-100 drop-shadow-md">
-              Join our community of food lovers and explore the best dining experiences in your area
-            </p>
-            <button 
-              onClick={() => navigate('/explore')}
-              className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-xl animate-fade-in delay-200"
-            >
-              Start Exploring
-            </button>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="relative bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

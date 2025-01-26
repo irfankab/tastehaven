@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
-import { SearchBar } from "@/components/restaurants/SearchBar";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Header } from "@/components/layout/Header";
 
-// Using the same mock data for now
 const MOCK_RESTAURANTS = [
   {
     id: 1,
@@ -398,19 +397,15 @@ const ExploreRestaurants = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header onSearch={setSearchQuery} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="ghost" size="icon">
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-900">Explore Restaurants</h1>
-          </div>
-          <div className="w-72">
-            <SearchBar onSearch={setSearchQuery} />
-          </div>
+        <div className="flex items-center gap-4 mb-8">
+          <Link to="/">
+            <Button variant="ghost" size="icon">
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900">Explore Restaurants</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
