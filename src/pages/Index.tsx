@@ -133,6 +133,7 @@ const Index = () => {
         </header>
 
         <main className="relative bg-gray-50">
+          {/* Popular Restaurants Section */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center mb-12">
               <h3 className="text-3xl font-bold text-gray-900 mb-4">
@@ -144,7 +145,7 @@ const Index = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredRestaurants.map((restaurant, index) => (
+              {filteredRestaurants.slice(0, 3).map((restaurant, index) => (
                 <div
                   key={restaurant.id}
                   className="transform hover:-translate-y-2 transition-all duration-300"
@@ -157,14 +158,44 @@ const Index = () => {
                 </div>
               ))}
             </div>
-
-            {filteredRestaurants.length === 0 && (
-              <div className="text-center py-12 text-gray-500 bg-white rounded-lg shadow-sm">
-                No restaurants found matching your search.
-              </div>
-            )}
           </div>
 
+          {/* All Restaurants Section */}
+          <div className="bg-white py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                  All Restaurants
+                </h3>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Explore our complete collection of amazing dining spots
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredRestaurants.map((restaurant, index) => (
+                  <div
+                    key={restaurant.id}
+                    className="transform hover:-translate-y-2 transition-all duration-300"
+                    style={{
+                      opacity: 0,
+                      animation: `fade-in 0.5s ease-out forwards ${index * 0.1}s`,
+                    }}
+                  >
+                    <RestaurantCard {...restaurant} />
+                  </div>
+                ))}
+              </div>
+
+              {filteredRestaurants.length === 0 && (
+                <div className="text-center py-12 text-gray-500 bg-white rounded-lg shadow-sm">
+                  No restaurants found matching your search.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Features Section */}
           <div className="bg-white py-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-3 gap-8 text-center">
