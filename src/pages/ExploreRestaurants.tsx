@@ -7,7 +7,7 @@ import { Header } from "@/components/layout/Header";
 
 const MOCK_RESTAURANTS = [
   {
-    id: 1,
+    id: "1", // Changed from number to string
     name: "The Italian Place",
     cuisine: "Italian",
     rating: 4.5,
@@ -26,7 +26,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 2,
+    id: "2", // Changed from number to string
     name: "Sushi Master",
     cuisine: "Japanese",
     rating: 4.8,
@@ -45,7 +45,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 3,
+    id: "3", // Changed from number to string
     name: "Burger Haven",
     cuisine: "American",
     rating: 4.2,
@@ -64,7 +64,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 4,
+    id: "4", // Changed from number to string
     name: "Taco Fiesta",
     cuisine: "Mexican",
     rating: 4.6,
@@ -83,7 +83,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 5,
+    id: "5", // Changed from number to string
     name: "Thai Spice",
     cuisine: "Thai",
     rating: 4.7,
@@ -102,7 +102,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 6,
+    id: "6", // Changed from number to string
     name: "Mediterranean Delight",
     cuisine: "Mediterranean",
     rating: 4.4,
@@ -121,7 +121,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 7,
+    id: "7", // Changed from number to string
     name: "Curry House",
     cuisine: "Indian",
     rating: 4.6,
@@ -140,7 +140,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 8,
+    id: "8", // Changed from number to string
     name: "The Steakhouse",
     cuisine: "American",
     rating: 4.9,
@@ -159,7 +159,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 9,
+    id: "9", // Changed from number to string
     name: "Dim Sum Paradise",
     cuisine: "Chinese",
     rating: 4.5,
@@ -178,7 +178,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 10,
+    id: "10", // Changed from number to string
     name: "French Bistro",
     cuisine: "French",
     rating: 4.7,
@@ -197,7 +197,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 11,
+    id: "11", // Changed from number to string
     name: "BBQ Ranch",
     cuisine: "American",
     rating: 4.4,
@@ -216,7 +216,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 12,
+    id: "12", // Changed from number to string
     name: "Seafood Harbor",
     cuisine: "Seafood",
     rating: 4.6,
@@ -235,7 +235,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 13,
+    id: "13", // Changed from number to string
     name: "Vegan Delight",
     cuisine: "Vegan",
     rating: 4.3,
@@ -254,7 +254,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 14,
+    id: "14", // Changed from number to string
     name: "Korean BBQ House",
     cuisine: "Korean",
     rating: 4.8,
@@ -273,7 +273,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 15,
+    id: "15", // Changed from number to string
     name: "Pizza Paradise",
     cuisine: "Italian",
     rating: 4.5,
@@ -292,7 +292,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 16,
+    id: "16", // Changed from number to string
     name: "Greek Taverna",
     cuisine: "Greek",
     rating: 4.6,
@@ -311,7 +311,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 17,
+    id: "17", // Changed from number to string
     name: "Ramen Shop",
     cuisine: "Japanese",
     rating: 4.7,
@@ -330,7 +330,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 18,
+    id: "18", // Changed from number to string
     name: "Brazilian Steakhouse",
     cuisine: "Brazilian",
     rating: 4.8,
@@ -349,7 +349,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 19,
+    id: "19", // Changed from number to string
     name: "Spanish Tapas",
     cuisine: "Spanish",
     rating: 4.5,
@@ -368,7 +368,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: 20,
+    id: "20", // Changed from number to string
     name: "Vietnamese Pho",
     cuisine: "Vietnamese",
     rating: 4.6,

@@ -21,7 +21,7 @@ interface Review {
 }
 
 interface RestaurantCardProps {
-  id: number;
+  id: string; // Changed from number to string to match UUID from Supabase
   name: string;
   cuisine: string;
   rating: number;
@@ -185,6 +185,9 @@ export const RestaurantCard = ({
             restaurantId={id}
             restaurantName={name}
             onClose={() => setIsReviewOpen(false)}
+            onReviewSubmitted={() => {
+              // Handle review submission if needed
+            }}
           />
         </DialogContent>
       </Dialog>
