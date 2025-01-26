@@ -16,9 +16,11 @@ export const AuthForm = () => {
   };
 
   return (
-    <Card className="w-[350px]">
+    <Card className="w-full backdrop-blur-sm bg-white/80 border-none shadow-xl">
       <CardHeader>
-        <CardTitle>{isLogin ? "Login" : "Sign Up"}</CardTitle>
+        <CardTitle className="text-2xl text-center">
+          {isLogin ? "Welcome Back" : "Join TasteHaven"}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -28,6 +30,7 @@ export const AuthForm = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="bg-white/50"
           />
           <Input
             type="password"
@@ -35,14 +38,18 @@ export const AuthForm = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="bg-white/50"
           />
-          <Button type="submit" className="w-full">
+          <Button 
+            type="submit" 
+            className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
+          >
             {isLogin ? "Login" : "Sign Up"}
           </Button>
           <Button
             type="button"
             variant="ghost"
-            className="w-full"
+            className="w-full hover:bg-white/10"
             onClick={() => setIsLogin(!isLogin)}
           >
             {isLogin ? "Need an account? Sign up" : "Have an account? Login"}
