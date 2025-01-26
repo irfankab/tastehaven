@@ -4,24 +4,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { Star, Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ReviewFormProps {
-  restaurantId: number;
+  restaurantId: string;
   restaurantName: string;
   onClose: () => void;
+  onReviewSubmitted?: () => void;
 }
 
-export const ReviewForm = ({ restaurantId, restaurantName, onClose }: ReviewFormProps) => {
+export const ReviewForm = ({ restaurantId, restaurantName, onClose, onReviewSubmitted }: ReviewFormProps) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [hoveredStar, setHoveredStar] = useState(0);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
+      const file = e.target.files[0];
+      setSelectedImage(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -30,19 +41,19 @@ export const ReviewForm = ({ restaurantId, restaurantName, onClose }: ReviewForm
     setIsUploading(true);
 
     try {
-      let imageUrl = null;
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) throw new Error("User not authenticated");
 
+      let imageUrl = null;
       if (selectedImage) {
         const fileExt = selectedImage.name.split('.').pop();
         const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError, data } = await supabase.storage
           .from('restaurant-images')
           .upload(filePath, selectedImage);
 
-        if (uploadError) {
-          throw uploadError;
-        }
+        if (uploadError) throw uploadError;
 
         const { data: { publicUrl } } = supabase.storage
           .from('restaurant-images')
@@ -51,28 +62,30 @@ export const ReviewForm = ({ restaurantId, restaurantName, onClose }: ReviewForm
         imageUrl = publicUrl;
       }
 
-      // Here you would typically send this to your backend
-      const review = {
-        restaurantId,
-        rating,
-        comment,
-        image_url: imageUrl,
-        date: new Date().toISOString(),
-      };
+      const { error: insertError } = await supabase
+        .from('reviews')
+        .insert({
+          restaurant_id: restaurantId,
+          user_id: user.id,
+          rating,
+          comment,
+          image_url: imageUrl
+        });
 
-      console.log("Submitted review:", review);
-      
+      if (insertError) throw insertError;
+
       toast({
         title: "Review submitted!",
         description: "Thank you for sharing your experience.",
       });
-      
+
+      onReviewSubmitted?.();
       onClose();
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Error submitting review:', error);
       toast({
         title: "Error",
-        description: "Failed to upload image. Please try again.",
+        description: "Failed to submit review. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -123,6 +136,26 @@ export const ReviewForm = ({ restaurantId, restaurantName, onClose }: ReviewForm
           {selectedImage ? selectedImage.name : "Add a photo"}
         </label>
       </div>
+
+      {imagePreview && (
+        <div className="relative">
+          <img
+            src={imagePreview}
+            alt="Preview"
+            className="max-h-40 rounded-md object-cover"
+          />
+          <button
+            type="button"
+            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+            onClick={() => {
+              setSelectedImage(null);
+              setImagePreview(null);
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <div className="flex justify-end space-x-2">
         <Button variant="outline" onClick={onClose} type="button">
