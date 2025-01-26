@@ -42,12 +42,12 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-white">
         {/* Header */}
-        <header className="bg-gray-800 text-white">
+        <header className="bg-gradient-to-r from-red-600 to-orange-500 text-white shadow-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               {/* Logo */}
               <div className="flex items-center">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold text-white">
                   REVBD
                 </h1>
               </div>
@@ -59,10 +59,9 @@ const Index = () => {
 
               {/* Navigation */}
               <nav className="flex items-center space-x-4">
-                <button className="hover:text-gray-300">Write a Review</button>
-                <button className="hover:text-gray-300">Start a Project</button>
-                <button className="hover:text-gray-300">Log In</button>
-                <button className="bg-red-600 px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
+                <button className="hover:text-gray-200 transition-colors">Write a Review</button>
+                <button className="hover:text-gray-200 transition-colors">Log In</button>
+                <button className="bg-white text-red-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors">
                   Sign Up
                 </button>
               </nav>
@@ -93,13 +92,17 @@ const Index = () => {
               </div>
 
               <div className="mt-12 text-center space-y-4 animate-fade-in animation-delay-300">
-                <p className="text-gray-600">Browse trending restaurants below</p>
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">Discover Amazing Restaurants</h2>
+                <p className="text-gray-600 max-w-2xl mx-auto mb-8">
+                  Join our community of food enthusiasts and explore the best dining spots in your area
+                </p>
                 <ArrowRight className="mx-auto text-red-500 animate-bounce" />
               </div>
             </div>
           </div>
 
           <div className="max-w-6xl mx-auto p-6">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">Popular Restaurants</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRestaurants.map((restaurant) => (
                 <RestaurantCard key={restaurant.id} {...restaurant} />
