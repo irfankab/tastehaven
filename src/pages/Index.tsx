@@ -19,14 +19,6 @@ const MOCK_RESTAURANTS = [
         comment: "Amazing pasta and great service!",
         date: "2024-03-15",
         likes: 5
-      },
-      {
-        id: 2,
-        userName: "Sarah Smith",
-        rating: 4.0,
-        comment: "Authentic Italian flavors, but a bit pricey.",
-        date: "2024-03-10",
-        likes: 3
       }
     ]
   },
@@ -46,14 +38,6 @@ const MOCK_RESTAURANTS = [
         comment: "Best sushi in town! Fresh and delicious.",
         date: "2024-03-14",
         likes: 8
-      },
-      {
-        id: 4,
-        userName: "Emily Chen",
-        rating: 4.5,
-        comment: "Great variety and excellent presentation.",
-        date: "2024-03-12",
-        likes: 6
       }
     ]
   },
@@ -73,14 +57,63 @@ const MOCK_RESTAURANTS = [
         comment: "Juicy burgers and crispy fries!",
         date: "2024-03-13",
         likes: 4
-      },
+      }
+    ]
+  },
+  {
+    id: 4,
+    name: "Taco Fiesta",
+    cuisine: "Mexican",
+    rating: 4.6,
+    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
+    priceRange: "$$",
+    likes: 31,
+    reviews: [
       {
-        id: 6,
-        userName: "Lisa Brown",
+        id: 7,
+        userName: "Maria Garcia",
         rating: 4.5,
-        comment: "Great value for money, generous portions.",
+        comment: "Authentic Mexican flavors! Love the street tacos.",
+        date: "2024-03-12",
+        likes: 6
+      }
+    ]
+  },
+  {
+    id: 5,
+    name: "Thai Spice",
+    cuisine: "Thai",
+    rating: 4.7,
+    imageUrl: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b",
+    priceRange: "$$",
+    likes: 28,
+    reviews: [
+      {
+        id: 9,
+        userName: "Sarah Lee",
+        rating: 5.0,
+        comment: "Perfect spice levels and great variety!",
         date: "2024-03-11",
-        likes: 2
+        likes: 7
+      }
+    ]
+  },
+  {
+    id: 6,
+    name: "Mediterranean Delight",
+    cuisine: "Mediterranean",
+    rating: 4.4,
+    imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947",
+    priceRange: "$$",
+    likes: 22,
+    reviews: [
+      {
+        id: 11,
+        userName: "Alex Brown",
+        rating: 4.5,
+        comment: "Fresh ingredients and amazing hummus!",
+        date: "2024-03-10",
+        likes: 5
       }
     ]
   }
