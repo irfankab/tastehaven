@@ -7,12 +7,13 @@ import { Header } from "@/components/layout/Header";
 
 const MOCK_RESTAURANTS = [
   {
-    id: "1", // Changed from number to string
+    id: "1",
     name: "The Italian Place",
     cuisine: "Italian",
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
     priceRange: "$$",
+    address: "123 Main St, New York, NY 10001",
     likes: 24,
     reviews: [
       {

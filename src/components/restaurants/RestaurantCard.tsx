@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Star, MessageSquare, ThumbsUp, Image } from "lucide-react";
+import { Star, MessageSquare, ThumbsUp, MapPin } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ReviewForm } from "./ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
 
 interface Review {
   id: number;
@@ -29,6 +30,7 @@ interface RestaurantCardProps {
   rating: number;
   imageUrl: string;
   priceRange: string;
+  address: string;
   reviews?: Review[];
   likes?: number;
 }
@@ -40,11 +42,13 @@ export const RestaurantCard = ({
   rating,
   imageUrl,
   priceRange,
+  address,
   reviews = [],
   likes = 0,
 }: RestaurantCardProps) => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [isWritingReview, setIsWritingReview] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [localLikes, setLocalLikes] = useState(likes);
   const [localReviews, setLocalReviews] = useState(reviews);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -101,11 +105,34 @@ export const RestaurantCard = ({
     setIsWritingReview(true);
   };
 
-  // ... keep existing code (JSX for the restaurant card layout)
+  // Mock menu data (you can replace this with real data from your backend)
+  const menuSections = [
+    {
+      name: "Appetizers",
+      items: [
+        { name: "Spring Rolls", price: "$6.99" },
+        { name: "Garlic Bread", price: "$4.99" },
+      ]
+    },
+    {
+      name: "Main Course",
+      items: [
+        { name: "Grilled Salmon", price: "$24.99" },
+        { name: "Beef Steak", price: "$29.99" },
+      ]
+    },
+    {
+      name: "Desserts",
+      items: [
+        { name: "Chocolate Cake", price: "$8.99" },
+        { name: "Ice Cream", price: "$5.99" },
+      ]
+    }
+  ];
 
   return (
     <Card className="overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300">
-      <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogTrigger asChild>
           <div>
             <div className="h-48 overflow-hidden">
@@ -142,83 +169,89 @@ export const RestaurantCard = ({
               </div>
               <p className="text-sm text-gray-600">{priceRange}</p>
             </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="mt-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <MessageSquare className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">
-                    Latest Reviews ({localReviews.length})
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {localReviews.map((review) => (
-                    <div key={review.id} className="border-b border-gray-100 pb-3 last:border-0">
-                      <div className="flex justify-between items-start mb-1">
-                        <span className="text-sm font-medium">{review.userName}</span>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="hover:text-red-600"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleLikeReview(review.id);
-                            }}
-                          >
-                            <ThumbsUp className="w-4 h-4 mr-1" />
-                            <span>{review.likes || 0}</span>
-                          </Button>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm">{review.rating.toFixed(1)}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600">{review.comment}</p>
-                      {review.image_url && (
-                        <div className="mt-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                className="p-0 h-20 w-20 relative overflow-hidden rounded-md hover:opacity-90"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedImage(review.image_url);
-                                }}
-                              >
-                                <img 
-                                  src={review.image_url} 
-                                  alt="Review" 
-                                  className="w-full h-full object-cover"
-                                />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[600px] p-0">
-                              <img 
-                                src={review.image_url} 
-                                alt="Review" 
-                                className="w-full h-auto"
-                              />
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      )}
-                      <p className="text-xs text-gray-400 mt-1">
-                        {new Date(review.date).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 flex justify-end">
-                  <Button onClick={handleReviewClick}>
-                    Write a Review
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
           </div>
         </DialogTrigger>
+        <DialogContent className="max-w-2xl">
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-2xl font-bold">{name}</h2>
+              <div className="flex items-center gap-2 text-gray-600 mt-2">
+                <MapPin className="w-4 h-4" />
+                <p>{address}</p>
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Menu</h3>
+              <div className="space-y-6">
+                {menuSections.map((section, index) => (
+                  <div key={index}>
+                    <h4 className="text-lg font-medium mb-2">{section.name}</h4>
+                    <div className="space-y-2">
+                      {section.items.map((item, itemIndex) => (
+                        <div key={itemIndex} className="flex justify-between items-center">
+                          <span>{item.name}</span>
+                          <span className="text-gray-600">{item.price}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <Separator />
+
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold">Reviews</h3>
+                <Button onClick={handleReviewClick}>
+                  Write a Review
+                </Button>
+              </div>
+              <div className="space-y-4 max-h-[300px] overflow-y-auto">
+                {localReviews.map((review) => (
+                  <div key={review.id} className="border-b pb-4">
+                    <div className="flex justify-between items-start">
+                      <span className="font-medium">{review.userName}</span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:text-red-600"
+                          onClick={() => handleLikeReview(review.id)}
+                        >
+                          <ThumbsUp className="w-4 h-4 mr-1" />
+                          <span>{review.likes || 0}</span>
+                        </Button>
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="ml-1">{review.rating.toFixed(1)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="mt-2 text-gray-600">{review.comment}</p>
+                    {review.image_url && (
+                      <img
+                        src={review.image_url}
+                        alt="Review"
+                        className="mt-2 rounded-md max-h-40 object-cover"
+                      />
+                    )}
+                    <p className="text-sm text-gray-400 mt-2">
+                      {new Date(review.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
         <DialogContent>
           {isWritingReview ? (
             <ReviewForm
@@ -237,44 +270,7 @@ export const RestaurantCard = ({
                 });
               }}
             />
-          ) : (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Reviews for {name}</h3>
-              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-                {localReviews.map((review) => (
-                  <div key={review.id} className="border-b pb-4">
-                    <div className="flex justify-between items-start">
-                      <span className="font-medium">{review.userName}</span>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span className="ml-1">{review.rating.toFixed(1)}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-gray-600">{review.comment}</p>
-                    {review.image_url && (
-                      <div className="mt-2">
-                        <img
-                          src={review.image_url}
-                          alt="Review"
-                          className="rounded-md max-h-40 object-cover"
-                        />
-                      </div>
-                    )}
-                    <p className="text-sm text-gray-400 mt-2">
-                      {new Date(review.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-end pt-4 border-t">
-                <Button onClick={handleReviewClick}>
-                  Write a Review
-                </Button>
-              </div>
-            </div>
-          )}
+          ) : null}
         </DialogContent>
       </Dialog>
     </Card>
