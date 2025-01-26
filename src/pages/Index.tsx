@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { AuthForm } from "@/components/auth/AuthForm";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
 import { SearchBar } from "@/components/restaurants/SearchBar";
 import { ArrowRight, Star, MessageCircle } from "lucide-react";
@@ -76,15 +75,6 @@ const Index = () => {
           <div className="relative bg-gradient-to-br from-red-50 to-orange-50">
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000')] opacity-5"></div>
             <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-6">
-              <div className="w-full max-w-md mb-12 animate-fade-in">
-                <div className="text-center mb-6">
-                  <h2 className="text-4xl font-bold mb-4">Join REVBD Today</h2>
-                  <p className="text-lg font-semibold text-gray-800">Create an account to start reviewing</p>
-                  <p className="text-sm text-gray-600 mt-2">Join our community of food enthusiasts</p>
-                </div>
-                <AuthForm />
-              </div>
-
               <div className="flex flex-wrap justify-center gap-8 mb-12 animate-fade-in animation-delay-100">
                 <div className="text-center">
                   <div className="flex items-center justify-center w-16 h-16 mb-4 mx-auto rounded-full bg-red-100">
