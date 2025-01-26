@@ -12,6 +12,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
     priceRange: "$$",
+    address: "123 Main St, New York, NY 10001",
     likes: 24,
     reviews: [
       {
@@ -31,6 +32,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c",
     priceRange: "$$$",
+    address: "456 Sushi Lane, New York, NY 10002",
     likes: 42,
     reviews: [
       {
@@ -50,6 +52,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.2,
     imageUrl: "https://images.unsplash.com/photo-1565299543923-37dd37887442",
     priceRange: "$",
+    address: "789 Burger Blvd, New York, NY 10003",
     likes: 18,
     reviews: [
       {
@@ -69,6 +72,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
     priceRange: "$$",
+    address: "321 Taco St, New York, NY 10004",
     likes: 31,
     reviews: [
       {
@@ -88,6 +92,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.7,
     imageUrl: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b",
     priceRange: "$$",
+    address: "654 Thai Ave, New York, NY 10005",
     likes: 28,
     reviews: [
       {
@@ -107,6 +112,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.4,
     imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947",
     priceRange: "$$",
+    address: "987 Mediterranean Way, New York, NY 10006",
     likes: 22,
     reviews: [
       {
@@ -126,6 +132,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
     priceRange: "$$",
+    address: "159 Curry Rd, New York, NY 10007",
     likes: 35,
     reviews: [
       {
@@ -145,6 +152,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.9,
     imageUrl: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
     priceRange: "$$$$",
+    address: "852 Steak St, New York, NY 10008",
     likes: 45,
     reviews: [
       {
@@ -164,6 +172,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
     priceRange: "$$",
+    address: "753 Dim Sum Blvd, New York, NY 10009",
     likes: 29,
     reviews: [
       {
@@ -183,6 +192,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.7,
     imageUrl: "https://images.unsplash.com/photo-1452378174528-3090a4bba7b2",
     priceRange: "$$$",
+    address: "246 French St, New York, NY 10010",
     likes: 38,
     reviews: [
       {
@@ -202,6 +212,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.4,
     imageUrl: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
     priceRange: "$$",
+    address: "369 BBQ Rd, New York, NY 10011",
     likes: 32,
     reviews: [
       {
@@ -221,6 +232,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
     priceRange: "$$$",
+    address: "852 Seafood St, New York, NY 10012",
     likes: 41,
     reviews: [
       {
@@ -240,6 +252,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.3,
     imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c",
     priceRange: "$$",
+    address: "963 Vegan Ave, New York, NY 10013",
     likes: 25,
     reviews: [
       {
@@ -259,6 +272,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1565299543923-37dd37887442",
     priceRange: "$$$",
+    address: "147 Korean BBQ Rd, New York, NY 10014",
     likes: 47,
     reviews: [
       {
@@ -278,6 +292,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
     priceRange: "$$",
+    address: "258 Pizza St, New York, NY 10015",
     likes: 33,
     reviews: [
       {
@@ -297,6 +312,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b",
     priceRange: "$$",
+    address: "369 Greek St, New York, NY 10016",
     likes: 36,
     reviews: [
       {
@@ -316,6 +332,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.7,
     imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947",
     priceRange: "$$",
+    address: "741 Ramen Rd, New York, NY 10017",
     likes: 39,
     reviews: [
       {
@@ -335,6 +352,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
     priceRange: "$$$",
+    address: "852 Brazilian Rd, New York, NY 10018",
     likes: 44,
     reviews: [
       {
@@ -354,6 +372,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
     priceRange: "$$",
+    address: "963 Spanish St, New York, NY 10019",
     likes: 31,
     reviews: [
       {
@@ -373,6 +392,7 @@ const MOCK_RESTAURANTS = [
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
     priceRange: "$",
+    address: "159 Pho St, New York, NY 10020",
     likes: 34,
     reviews: [
       {

@@ -27,12 +27,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "2", // Changed from number to string
+    id: "2",
     name: "Sushi Master",
     cuisine: "Japanese",
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c",
     priceRange: "$$$",
+    address: "456 Sushi Lane, New York, NY 10002",
     likes: 42,
     reviews: [
       {
@@ -46,12 +47,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "3", // Changed from number to string
+    id: "3",
     name: "Burger Haven",
     cuisine: "American",
     rating: 4.2,
     imageUrl: "https://images.unsplash.com/photo-1565299543923-37dd37887442",
     priceRange: "$",
+    address: "789 Burger Blvd, New York, NY 10003",
     likes: 18,
     reviews: [
       {
@@ -65,12 +67,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "4", // Changed from number to string
+    id: "4",
     name: "Taco Fiesta",
     cuisine: "Mexican",
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
     priceRange: "$$",
+    address: "321 Taco St, New York, NY 10004",
     likes: 31,
     reviews: [
       {
@@ -84,12 +87,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "5", // Changed from number to string
+    id: "5",
     name: "Thai Spice",
     cuisine: "Thai",
     rating: 4.7,
     imageUrl: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b",
     priceRange: "$$",
+    address: "654 Thai Ave, New York, NY 10005",
     likes: 28,
     reviews: [
       {
@@ -103,12 +107,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "6", // Changed from number to string
+    id: "6",
     name: "Mediterranean Delight",
     cuisine: "Mediterranean",
     rating: 4.4,
     imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947",
     priceRange: "$$",
+    address: "987 Mediterranean Way, New York, NY 10006",
     likes: 22,
     reviews: [
       {
@@ -122,12 +127,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "7", // Changed from number to string
+    id: "7",
     name: "Curry House",
     cuisine: "Indian",
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
     priceRange: "$$",
+    address: "159 Curry Rd, New York, NY 10007",
     likes: 35,
     reviews: [
       {
@@ -141,12 +147,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "8", // Changed from number to string
+    id: "8",
     name: "The Steakhouse",
     cuisine: "American",
     rating: 4.9,
     imageUrl: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
     priceRange: "$$$$",
+    address: "258 Steak St, New York, NY 10008",
     likes: 45,
     reviews: [
       {
@@ -160,12 +167,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "9", // Changed from number to string
+    id: "9",
     name: "Dim Sum Paradise",
     cuisine: "Chinese",
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
     priceRange: "$$",
+    address: "369 Dim Sum St, New York, NY 10009",
     likes: 29,
     reviews: [
       {
@@ -179,12 +187,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "10", // Changed from number to string
+    id: "10",
     name: "French Bistro",
     cuisine: "French",
     rating: 4.7,
     imageUrl: "https://images.unsplash.com/photo-1452378174528-3090a4bba7b2",
     priceRange: "$$$",
+    address: "741 French St, New York, NY 10010",
     likes: 38,
     reviews: [
       {
@@ -198,12 +207,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "11", // Changed from number to string
+    id: "11",
     name: "BBQ Ranch",
     cuisine: "American",
     rating: 4.4,
     imageUrl: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
     priceRange: "$$",
+    address: "852 BBQ Blvd, New York, NY 10011",
     likes: 32,
     reviews: [
       {
@@ -217,12 +227,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "12", // Changed from number to string
+    id: "12",
     name: "Seafood Harbor",
     cuisine: "Seafood",
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
     priceRange: "$$$",
+    address: "963 Seafood St, New York, NY 10012",
     likes: 41,
     reviews: [
       {
@@ -236,12 +247,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "13", // Changed from number to string
+    id: "13",
     name: "Vegan Delight",
     cuisine: "Vegan",
     rating: 4.3,
     imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c",
     priceRange: "$$",
+    address: "147 Vegan Ave, New York, NY 10013",
     likes: 25,
     reviews: [
       {
@@ -255,12 +267,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "14", // Changed from number to string
+    id: "14",
     name: "Korean BBQ House",
     cuisine: "Korean",
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1565299543923-37dd37887442",
     priceRange: "$$$",
+    address: "258 Korean BBQ Rd, New York, NY 10014",
     likes: 47,
     reviews: [
       {
@@ -274,12 +287,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "15", // Changed from number to string
+    id: "15",
     name: "Pizza Paradise",
     cuisine: "Italian",
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
     priceRange: "$$",
+    address: "369 Pizza St, New York, NY 10015",
     likes: 33,
     reviews: [
       {
@@ -293,12 +307,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "16", // Changed from number to string
+    id: "16",
     name: "Greek Taverna",
     cuisine: "Greek",
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b",
     priceRange: "$$",
+    address: "741 Greek St, New York, NY 10016",
     likes: 36,
     reviews: [
       {
@@ -312,12 +327,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "17", // Changed from number to string
+    id: "17",
     name: "Ramen Shop",
     cuisine: "Japanese",
     rating: 4.7,
     imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947",
     priceRange: "$$",
+    address: "852 Ramen Rd, New York, NY 10017",
     likes: 39,
     reviews: [
       {
@@ -331,12 +347,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "18", // Changed from number to string
+    id: "18",
     name: "Brazilian Steakhouse",
     cuisine: "Brazilian",
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
     priceRange: "$$$",
+    address: "963 Brazilian Rd, New York, NY 10018",
     likes: 44,
     reviews: [
       {
@@ -350,12 +367,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "19", // Changed from number to string
+    id: "19",
     name: "Spanish Tapas",
     cuisine: "Spanish",
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
     priceRange: "$$",
+    address: "147 Spanish St, New York, NY 10019",
     likes: 31,
     reviews: [
       {
@@ -369,12 +387,13 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "20", // Changed from number to string
+    id: "20",
     name: "Vietnamese Pho",
     cuisine: "Vietnamese",
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
     priceRange: "$",
+    address: "258 Pho Rd, New York, NY 10020",
     likes: 34,
     reviews: [
       {
