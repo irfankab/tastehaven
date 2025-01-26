@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
 import { SearchBar } from "@/components/restaurants/SearchBar";
+import { supabase } from "@/integrations/supabase/client";
 
 const MOCK_RESTAURANTS = [
   {
@@ -388,6 +389,23 @@ const MOCK_RESTAURANTS = [
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const filteredRestaurants = MOCK_RESTAURANTS.filter((restaurant) =>
     restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -416,18 +434,29 @@ const Index = () => {
               <button className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full">
                 Write a Review
               </button>
-              <Link 
-                to="/auth" 
-                className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full"
-              >
-                Log In
-              </Link>
-              <Link 
-                to="/auth?mode=signup" 
-                className="bg-primary text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg"
-              >
-                Sign Up
-              </Link>
+              {!session ? (
+                <>
+                  <Link 
+                    to="/auth" 
+                    className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full"
+                  >
+                    Log In
+                  </Link>
+                  <Link 
+                    to="/auth?mode=signup" 
+                    className="bg-primary text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              ) : (
+                <button 
+                  onClick={() => supabase.auth.signOut()} 
+                  className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full"
+                >
+                  Sign Out
+                </button>
+              )}
             </nav>
           </div>
 
