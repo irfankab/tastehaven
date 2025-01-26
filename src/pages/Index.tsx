@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
 import { SearchBar } from "@/components/restaurants/SearchBar";
-import { ArrowRight, Star, MessageCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const MOCK_RESTAURANTS = [
   {
@@ -73,40 +73,15 @@ const Index = () => {
         <main>
           <div className="relative bg-gradient-to-br from-red-50 to-orange-50">
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000')] opacity-5"></div>
-            <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-6">
-              <div className="flex flex-wrap justify-center gap-8 mb-12 animate-fade-in animation-delay-100">
-                <div className="text-center">
-                  <div className="flex items-center justify-center w-16 h-16 mb-4 mx-auto rounded-full bg-red-100">
-                    <Star className="w-8 h-8 text-red-500" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Rate Restaurants</h3>
-                  <p className="text-gray-600 text-sm">Share your dining experiences</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center w-16 h-16 mb-4 mx-auto rounded-full bg-orange-100">
-                    <MessageCircle className="w-8 h-8 text-orange-500" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Write Reviews</h3>
-                  <p className="text-gray-600 text-sm">Help others discover great food</p>
+            <div className="relative z-10 p-6">
+              <div className="max-w-6xl mx-auto">
+                <h2 className="text-3xl font-bold text-gray-800 mb-6">Popular Restaurants</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredRestaurants.map((restaurant) => (
+                    <RestaurantCard key={restaurant.id} {...restaurant} />
+                  ))}
                 </div>
               </div>
-
-              <div className="mt-12 text-center space-y-4 animate-fade-in animation-delay-300">
-                <h2 className="text-3xl font-bold text-gray-800 mb-4">Discover Amazing Restaurants</h2>
-                <p className="text-gray-600 max-w-2xl mx-auto mb-8">
-                  Join our community of food enthusiasts and explore the best dining spots in your area
-                </p>
-                <ArrowRight className="mx-auto text-red-500 animate-bounce" />
-              </div>
-            </div>
-          </div>
-
-          <div className="max-w-6xl mx-auto p-6">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6">Popular Restaurants</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredRestaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.id} {...restaurant} />
-              ))}
             </div>
           </div>
         </main>
