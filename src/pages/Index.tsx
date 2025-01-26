@@ -4,7 +4,6 @@ import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
 import { SearchBar } from "@/components/restaurants/SearchBar";
 import { ArrowRight, Star, MessageCircle } from "lucide-react";
 
-// Mock data - replace with actual data later
 const MOCK_RESTAURANTS = [
   {
     id: 1,
@@ -45,10 +44,18 @@ const Index = () => {
       <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-red-50 to-orange-50">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000')] opacity-5"></div>
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
+          <div className="w-full max-w-md mb-12 animate-fade-in">
+            <div className="text-center mb-6">
+              <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                REVBD
+              </h1>
+              <p className="text-lg font-semibold text-gray-800">Create an account to start reviewing</p>
+              <p className="text-sm text-gray-600 mt-2">Join our community of food enthusiasts</p>
+            </div>
+            <AuthForm />
+          </div>
+          
           <div className="text-center mb-8 animate-fade-in">
-            <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-              REVBD
-            </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Your trusted platform for authentic restaurant reviews and ratings
             </p>
@@ -69,14 +76,6 @@ const Index = () => {
               <h3 className="font-semibold mb-2">Write Reviews</h3>
               <p className="text-gray-600 text-sm">Help others discover great food</p>
             </div>
-          </div>
-
-          <div className="w-full max-w-md animate-fade-in animation-delay-200">
-            <div className="text-center mb-6">
-              <p className="text-lg font-semibold text-gray-800">Create an account to start reviewing</p>
-              <p className="text-sm text-gray-600 mt-2">Join our community of food enthusiasts</p>
-            </div>
-            <AuthForm />
           </div>
 
           <div className="mt-12 text-center space-y-4 animate-fade-in animation-delay-300">
