@@ -16,10 +16,17 @@ export const AuthForm = ({ defaultMode = 'login' }: AuthFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [verifyPassword, setVerifyPassword] = useState("");
   const [fullName, setFullName] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isLogin && password !== verifyPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -93,6 +100,17 @@ export const AuthForm = ({ defaultMode = 'login' }: AuthFormProps) => {
             className="bg-white/50"
             disabled={isLoading}
           />
+          {!isLogin && (
+            <Input
+              type="password"
+              placeholder="Verify Password"
+              value={verifyPassword}
+              onChange={(e) => setVerifyPassword(e.target.value)}
+              required
+              className="bg-white/50"
+              disabled={isLoading}
+            />
+          )}
           <Button 
             type="submit" 
             className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
@@ -104,7 +122,11 @@ export const AuthForm = ({ defaultMode = 'login' }: AuthFormProps) => {
             type="button"
             variant="ghost"
             className="w-full hover:bg-white/10"
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setPassword("");
+              setVerifyPassword("");
+            }}
             disabled={isLoading}
           >
             {isLogin ? "Need an account? Sign up" : "Already have an account? Login"}
