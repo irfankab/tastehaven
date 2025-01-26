@@ -10,20 +10,23 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
     priceRange: "$$",
+    likes: 24,
     reviews: [
       {
         id: 1,
         userName: "John Doe",
         rating: 4.5,
         comment: "Amazing pasta and great service!",
-        date: "2024-03-15"
+        date: "2024-03-15",
+        likes: 5
       },
       {
         id: 2,
         userName: "Sarah Smith",
         rating: 4.0,
         comment: "Authentic Italian flavors, but a bit pricey.",
-        date: "2024-03-10"
+        date: "2024-03-10",
+        likes: 3
       }
     ]
   },
@@ -34,20 +37,23 @@ const MOCK_RESTAURANTS = [
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c",
     priceRange: "$$$",
+    likes: 42,
     reviews: [
       {
         id: 3,
         userName: "Mike Johnson",
         rating: 5.0,
         comment: "Best sushi in town! Fresh and delicious.",
-        date: "2024-03-14"
+        date: "2024-03-14",
+        likes: 8
       },
       {
         id: 4,
         userName: "Emily Chen",
         rating: 4.5,
         comment: "Great variety and excellent presentation.",
-        date: "2024-03-12"
+        date: "2024-03-12",
+        likes: 6
       }
     ]
   },
@@ -58,20 +64,23 @@ const MOCK_RESTAURANTS = [
     rating: 4.2,
     imageUrl: "https://images.unsplash.com/photo-1565299543923-37dd37887442",
     priceRange: "$",
+    likes: 18,
     reviews: [
       {
         id: 5,
         userName: "David Wilson",
         rating: 4.0,
         comment: "Juicy burgers and crispy fries!",
-        date: "2024-03-13"
+        date: "2024-03-13",
+        likes: 4
       },
       {
         id: 6,
         userName: "Lisa Brown",
         rating: 4.5,
         comment: "Great value for money, generous portions.",
-        date: "2024-03-11"
+        date: "2024-03-11",
+        likes: 2
       }
     ]
   }
@@ -133,7 +142,6 @@ const Index = () => {
         </header>
 
         <main className="relative bg-gray-50">
-          {/* Popular Restaurants Section */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center mb-12">
               <h3 className="text-3xl font-bold text-gray-900 mb-4">
@@ -145,7 +153,7 @@ const Index = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredRestaurants.slice(0, 3).map((restaurant, index) => (
+              {filteredRestaurants.map((restaurant, index) => (
                 <div
                   key={restaurant.id}
                   className="transform hover:-translate-y-2 transition-all duration-300"
@@ -158,61 +166,12 @@ const Index = () => {
                 </div>
               ))}
             </div>
-          </div>
 
-          {/* All Restaurants Section */}
-          <div className="bg-white py-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold text-gray-900 mb-4">
-                  All Restaurants
-                </h3>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Explore our complete collection of amazing dining spots
-                </p>
+            {filteredRestaurants.length === 0 && (
+              <div className="text-center py-12 text-gray-500 bg-white rounded-lg shadow-sm">
+                No restaurants found matching your search.
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredRestaurants.map((restaurant, index) => (
-                  <div
-                    key={restaurant.id}
-                    className="transform hover:-translate-y-2 transition-all duration-300"
-                    style={{
-                      opacity: 0,
-                      animation: `fade-in 0.5s ease-out forwards ${index * 0.1}s`,
-                    }}
-                  >
-                    <RestaurantCard {...restaurant} />
-                  </div>
-                ))}
-              </div>
-
-              {filteredRestaurants.length === 0 && (
-                <div className="text-center py-12 text-gray-500 bg-white rounded-lg shadow-sm">
-                  No restaurants found matching your search.
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Features Section */}
-          <div className="bg-white py-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid md:grid-cols-3 gap-8 text-center">
-                <div className="p-6 rounded-xl bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <h4 className="text-xl font-semibold mb-2 text-gray-900">Trusted Reviews</h4>
-                  <p className="text-gray-600">Real experiences shared by our passionate community</p>
-                </div>
-                <div className="p-6 rounded-xl bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <h4 className="text-xl font-semibold mb-2 text-gray-900">Local Gems</h4>
-                  <p className="text-gray-600">Discover hidden culinary treasures in your area</p>
-                </div>
-                <div className="p-6 rounded-xl bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <h4 className="text-xl font-semibold mb-2 text-gray-900">Photo Gallery</h4>
-                  <p className="text-gray-600">Visual stories of amazing dining experiences</p>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </main>
 
