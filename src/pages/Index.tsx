@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
 import { SearchBar } from "@/components/restaurants/SearchBar";
 
@@ -120,7 +121,6 @@ const MOCK_RESTAURANTS = [
 ];
 
 const Index = () => {
-  const [isAuthenticated] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredRestaurants = MOCK_RESTAURANTS.filter((restaurant) =>
@@ -150,12 +150,18 @@ const Index = () => {
               <button className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full">
                 Write a Review
               </button>
-              <button className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full">
+              <Link 
+                to="/auth" 
+                className="text-white bg-black/20 hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-full"
+              >
                 Log In
-              </button>
-              <button className="bg-primary text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg">
+              </Link>
+              <Link 
+                to="/auth" 
+                className="bg-primary text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg"
+              >
                 Sign Up
-              </button>
+              </Link>
             </nav>
           </div>
 
