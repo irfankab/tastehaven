@@ -157,7 +157,7 @@ const Index = () => {
                 Log In
               </Link>
               <Link 
-                to="/auth" 
+                to="/auth?mode=signup" 
                 className="bg-primary text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg"
               >
                 Sign Up
