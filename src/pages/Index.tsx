@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
 import { SearchBar } from "@/components/restaurants/SearchBar";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star, MessageCircle } from "lucide-react";
 
 // Mock data - replace with actual data later
 const MOCK_RESTAURANTS = [
@@ -45,19 +45,42 @@ const Index = () => {
       <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-red-50 to-orange-50">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000')] opacity-5"></div>
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
-          <div className="text-center mb-12 animate-fade-in">
+          <div className="text-center mb-8 animate-fade-in">
             <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-              TasteHaven
+              REVBD
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover and review the best restaurants in your area. Join our community of food lovers today!
+              Your trusted platform for authentic restaurant reviews and ratings
             </p>
           </div>
+          
+          <div className="flex flex-wrap justify-center gap-8 mb-12 animate-fade-in animation-delay-100">
+            <div className="text-center">
+              <div className="flex items-center justify-center w-16 h-16 mb-4 mx-auto rounded-full bg-red-100">
+                <Star className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="font-semibold mb-2">Rate Restaurants</h3>
+              <p className="text-gray-600 text-sm">Share your dining experiences</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center w-16 h-16 mb-4 mx-auto rounded-full bg-orange-100">
+                <MessageCircle className="w-8 h-8 text-orange-500" />
+              </div>
+              <h3 className="font-semibold mb-2">Write Reviews</h3>
+              <p className="text-gray-600 text-sm">Help others discover great food</p>
+            </div>
+          </div>
+
           <div className="w-full max-w-md animate-fade-in animation-delay-200">
+            <div className="text-center mb-6">
+              <p className="text-lg font-semibold text-gray-800">Create an account to start reviewing</p>
+              <p className="text-sm text-gray-600 mt-2">Join our community of food enthusiasts</p>
+            </div>
             <AuthForm />
           </div>
+
           <div className="mt-12 text-center space-y-4 animate-fade-in animation-delay-300">
-            <p className="text-gray-600">Already exploring? See what's trending</p>
+            <p className="text-gray-600">Browse trending restaurants below</p>
             <ArrowRight className="mx-auto text-red-500 animate-bounce" />
           </div>
         </div>
@@ -70,10 +93,10 @@ const Index = () => {
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="text-center space-y-4 animate-fade-in">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-            Find Your Next Favorite Restaurant
+            Discover Great Restaurants
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Explore curated recommendations from our community of food enthusiasts
+            Explore and review the best dining spots in your area
           </p>
         </div>
         <div className="max-w-xl mx-auto animate-fade-in animation-delay-100">

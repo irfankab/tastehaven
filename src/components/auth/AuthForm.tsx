@@ -19,7 +19,7 @@ export const AuthForm = () => {
     <Card className="w-full backdrop-blur-sm bg-white/80 border-none shadow-xl">
       <CardHeader>
         <CardTitle className="text-2xl text-center">
-          {isLogin ? "Welcome Back" : "Join TasteHaven"}
+          {isLogin ? "Welcome Back" : "Join REVBD"}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -44,7 +44,7 @@ export const AuthForm = () => {
             type="submit" 
             className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
           >
-            {isLogin ? "Login" : "Sign Up"}
+            {isLogin ? "Login" : "Sign Up to Review"}
           </Button>
           <Button
             type="button"
@@ -52,7 +52,7 @@ export const AuthForm = () => {
             className="w-full hover:bg-white/10"
             onClick={() => setIsLogin(!isLogin)}
           >
-            {isLogin ? "Need an account? Sign up" : "Have an account? Login"}
+            {isLogin ? "Need an account? Sign up to review" : "Have an account? Login"}
           </Button>
         </form>
       </CardContent>
