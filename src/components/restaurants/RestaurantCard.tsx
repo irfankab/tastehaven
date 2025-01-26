@@ -42,6 +42,7 @@ export const RestaurantCard = ({
   likes = 0,
 }: RestaurantCardProps) => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [isWritingReview, setIsWritingReview] = useState(false);
   const [localLikes, setLocalLikes] = useState(likes);
   const [localReviews, setLocalReviews] = useState(reviews);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -176,19 +177,76 @@ export const RestaurantCard = ({
                     </div>
                   ))}
                 </div>
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsWritingReview(true);
+                    }}
+                  >
+                    Write a Review
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </div>
         </DialogTrigger>
         <DialogContent>
-          <ReviewForm
-            restaurantId={id}
-            restaurantName={name}
-            onClose={() => setIsReviewOpen(false)}
-            onReviewSubmitted={() => {
-              // Handle review submission if needed
-            }}
-          />
+          {isWritingReview ? (
+            <ReviewForm
+              restaurantId={id}
+              restaurantName={name}
+              onClose={() => {
+                setIsWritingReview(false);
+                setIsReviewOpen(false);
+              }}
+              onReviewSubmitted={() => {
+                setIsWritingReview(false);
+                setIsReviewOpen(false);
+                toast({
+                  title: "Review submitted!",
+                  description: "Thank you for sharing your experience.",
+                });
+              }}
+            />
+          ) : (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Reviews for {name}</h3>
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                {localReviews.map((review) => (
+                  <div key={review.id} className="border-b pb-4">
+                    <div className="flex justify-between items-start">
+                      <span className="font-medium">{review.userName}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="ml-1">{review.rating.toFixed(1)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="mt-2 text-gray-600">{review.comment}</p>
+                    {review.image_url && (
+                      <div className="mt-2">
+                        <img
+                          src={review.image_url}
+                          alt="Review"
+                          className="rounded-md max-h-40 object-cover"
+                        />
+                      </div>
+                    )}
+                    <p className="text-sm text-gray-400 mt-2">
+                      {new Date(review.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={() => setIsWritingReview(true)}>
+                  Write a Review
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </Card>
