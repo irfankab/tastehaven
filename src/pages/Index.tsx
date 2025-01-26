@@ -11,6 +11,22 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
     priceRange: "$$",
+    reviews: [
+      {
+        id: 1,
+        userName: "John Doe",
+        rating: 4.5,
+        comment: "Amazing pasta and great service!",
+        date: "2024-03-15"
+      },
+      {
+        id: 2,
+        userName: "Sarah Smith",
+        rating: 4.0,
+        comment: "Authentic Italian flavors, but a bit pricey.",
+        date: "2024-03-10"
+      }
+    ]
   },
   {
     id: 2,
@@ -19,6 +35,22 @@ const MOCK_RESTAURANTS = [
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c",
     priceRange: "$$$",
+    reviews: [
+      {
+        id: 3,
+        userName: "Mike Johnson",
+        rating: 5.0,
+        comment: "Best sushi in town! Fresh and delicious.",
+        date: "2024-03-14"
+      },
+      {
+        id: 4,
+        userName: "Emily Chen",
+        rating: 4.5,
+        comment: "Great variety and excellent presentation.",
+        date: "2024-03-12"
+      }
+    ]
   },
   {
     id: 3,
@@ -27,7 +59,23 @@ const MOCK_RESTAURANTS = [
     rating: 4.2,
     imageUrl: "https://images.unsplash.com/photo-1565299543923-37dd37887442",
     priceRange: "$",
-  },
+    reviews: [
+      {
+        id: 5,
+        userName: "David Wilson",
+        rating: 4.0,
+        comment: "Juicy burgers and crispy fries!",
+        date: "2024-03-13"
+      },
+      {
+        id: 6,
+        userName: "Lisa Brown",
+        rating: 4.5,
+        comment: "Great value for money, generous portions.",
+        date: "2024-03-11"
+      }
+    ]
+  }
 ];
 
 const Index = () => {
@@ -41,7 +89,6 @@ const Index = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-white">
-        {/* Header */}
         <header className="bg-gradient-to-r from-red-600 to-orange-500 text-white shadow-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -69,7 +116,6 @@ const Index = () => {
           </div>
         </header>
 
-        {/* Main Content */}
         <main>
           <div className="relative bg-gradient-to-br from-red-50 to-orange-50">
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000')] opacity-5"></div>

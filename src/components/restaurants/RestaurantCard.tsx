@@ -1,5 +1,13 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Star } from "lucide-react";
+import { Star, MessageSquare } from "lucide-react";
+
+interface Review {
+  id: number;
+  userName: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
 
 interface RestaurantCardProps {
   name: string;
@@ -7,6 +15,7 @@ interface RestaurantCardProps {
   rating: number;
   imageUrl: string;
   priceRange: string;
+  reviews?: Review[];
 }
 
 export const RestaurantCard = ({
@@ -15,6 +24,7 @@ export const RestaurantCard = ({
   rating,
   imageUrl,
   priceRange,
+  reviews = [],
 }: RestaurantCardProps) => {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -38,6 +48,33 @@ export const RestaurantCard = ({
         </div>
         <p className="text-sm text-gray-600">{priceRange}</p>
       </CardHeader>
+      <CardContent className="p-4 pt-0">
+        <div className="mt-4">
+          <div className="flex items-center gap-2 mb-3">
+            <MessageSquare className="w-4 h-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">
+              Latest Reviews ({reviews.length})
+            </span>
+          </div>
+          <div className="space-y-3">
+            {reviews.map((review) => (
+              <div key={review.id} className="border-b border-gray-100 pb-3 last:border-0">
+                <div className="flex justify-between items-start mb-1">
+                  <span className="text-sm font-medium">{review.userName}</span>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <span className="text-sm">{review.rating.toFixed(1)}</span>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600">{review.comment}</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {new Date(review.date).toLocaleDateString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CardContent>
     </Card>
   );
 };
