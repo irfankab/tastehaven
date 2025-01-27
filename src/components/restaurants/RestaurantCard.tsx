@@ -67,8 +67,56 @@ export const RestaurantCard = ({
       setSession(session);
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    // Subscribe to real-time updates for reviews
+    const channel = supabase
+      .channel('reviews-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reviews',
+          filter: `restaurant_id=eq.${id}`
+        },
+        async (payload) => {
+          // Fetch the updated reviews for this restaurant
+          const { data: updatedReviews, error } = await supabase
+            .from('reviews')
+            .select(`
+              id,
+              rating,
+              comment,
+              created_at,
+              image_url,
+              profiles (
+                username,
+                full_name
+              )
+            `)
+            .eq('restaurant_id', id)
+            .order('created_at', { ascending: false });
+
+          if (!error && updatedReviews) {
+            const formattedReviews = updatedReviews.map(review => ({
+              id: review.id,
+              userName: review.profiles?.username || review.profiles?.full_name || 'Anonymous',
+              rating: review.rating,
+              comment: review.comment,
+              date: review.created_at,
+              image_url: review.image_url,
+              likes: 0 // You might want to implement a likes system separately
+            }));
+            setLocalReviews(formattedReviews);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+      supabase.removeChannel(channel);
+    };
+  }, [id]);
 
   const handleLikeRestaurant = async () => {
     if (!session) {
