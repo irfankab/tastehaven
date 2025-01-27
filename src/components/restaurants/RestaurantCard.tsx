@@ -173,24 +173,27 @@ export const RestaurantCard = ({
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogTrigger asChild>
           <div>
-            <div className="h-48 overflow-hidden">
+            <div className="h-48 overflow-hidden relative">
               <img
                 src={imageUrl}
                 alt={name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <CardHeader className="p-4">
               <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-lg group-hover:text-red-600 transition-colors">{name}</h3>
+                <div className="transform transition-transform duration-300 group-hover:translate-y-[-2px]">
+                  <h3 className="font-bold text-lg text-gray-900 group-hover:text-purple-600 transition-colors">
+                    {name}
+                  </h3>
                   <p className="text-sm text-gray-600">{cuisine}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="hover:text-red-600"
+                    className="hover:text-purple-600 transform transition-all duration-300 hover:scale-110"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleLikeRestaurant();
@@ -205,7 +208,21 @@ export const RestaurantCard = ({
                   </div>
                 </div>
               </div>
-              <p className="text-sm text-gray-600">{priceRange}</p>
+              <div className="mt-2 flex justify-between items-center">
+                <p className="text-sm text-gray-600">{priceRange}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="transform transition-all duration-300 hover:scale-105 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReviewClick(e);
+                  }}
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Write Review
+                </Button>
+              </div>
             </CardHeader>
           </div>
         </DialogTrigger>
@@ -221,15 +238,18 @@ export const RestaurantCard = ({
             
             <Separator />
             
-            <div>
+            <div className="animate-fade-in">
               <h3 className="text-xl font-semibold mb-4">Menu</h3>
               <div className="space-y-6">
                 {menuSections.map((section, index) => (
-                  <div key={index}>
+                  <div key={index} className="transform transition-all duration-300 hover:translate-x-1">
                     <h4 className="text-lg font-medium mb-2">{section.name}</h4>
                     <div className="space-y-2">
                       {section.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="flex justify-between items-center">
+                        <div 
+                          key={itemIndex} 
+                          className="flex justify-between items-center p-2 rounded-lg hover:bg-purple-50 transition-colors"
+                        >
                           <span>{item.name}</span>
                           <span className="text-gray-600">{item.price}</span>
                         </div>
@@ -242,23 +262,30 @@ export const RestaurantCard = ({
             
             <Separator />
 
-            <div>
+            <div className="animate-fade-in">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-semibold">Reviews</h3>
-                <Button onClick={handleReviewClick}>
+                <Button 
+                  onClick={handleReviewClick}
+                  className="bg-purple-600 hover:bg-purple-700 transform transition-all duration-300 hover:scale-105"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
                   Write a Review
                 </Button>
               </div>
               <div className="space-y-4 max-h-[300px] overflow-y-auto">
                 {localReviews.map((review) => (
-                  <div key={review.id} className="border-b pb-4">
+                  <div 
+                    key={review.id} 
+                    className="border-b pb-4 transform transition-all duration-300 hover:translate-x-1"
+                  >
                     <div className="flex justify-between items-start">
                       <span className="font-medium">{review.userName}</span>
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="hover:text-red-600"
+                          className="hover:text-purple-600 transform transition-all duration-300 hover:scale-110"
                           onClick={() => handleLikeReview(review.id)}
                         >
                           <ThumbsUp className="w-4 h-4 mr-1" />
@@ -275,7 +302,7 @@ export const RestaurantCard = ({
                       <img
                         src={review.image_url}
                         alt="Review"
-                        className="mt-2 rounded-md max-h-40 object-cover"
+                        className="mt-2 rounded-md max-h-40 object-cover transform transition-all duration-300 hover:scale-105"
                       />
                     )}
                     <p className="text-sm text-gray-400 mt-2">
