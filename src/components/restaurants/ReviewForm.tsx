@@ -2,18 +2,22 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Star, Upload } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ReviewFormProps {
   restaurantId: string;
   restaurantName: string;
   onClose: () => void;
-  onReviewSubmitted?: () => void;
+  onReviewSubmitted: (review: any) => void;
 }
 
-export const ReviewForm = ({ restaurantId, restaurantName, onClose, onReviewSubmitted }: ReviewFormProps) => {
+export const ReviewForm = ({ 
+  restaurantId, 
+  restaurantName, 
+  onClose, 
+  onReviewSubmitted 
+}: ReviewFormProps) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [hoveredStar, setHoveredStar] = useState(0);
@@ -38,6 +42,15 @@ export const ReviewForm = ({ restaurantId, restaurantName, onClose, onReviewSubm
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!rating || !comment) {
+      toast({
+        title: "Error",
+        description: "Please provide both a rating and a comment",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUploading(true);
 
     try {
@@ -62,25 +75,39 @@ export const ReviewForm = ({ restaurantId, restaurantName, onClose, onReviewSubm
         imageUrl = publicUrl;
       }
 
-      const { error: insertError } = await supabase
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single();
+
+      const newReview = {
+        restaurant_id: restaurantId,
+        user_id: user.id,
+        rating,
+        comment,
+        image_url: imageUrl
+      };
+
+      const { error: insertError, data: reviewData } = await supabase
         .from('reviews')
-        .insert({
-          restaurant_id: restaurantId,
-          user_id: user.id,
-          rating,
-          comment,
-          image_url: imageUrl
-        });
+        .insert(newReview)
+        .select()
+        .single();
 
       if (insertError) throw insertError;
 
-      toast({
-        title: "Review submitted!",
-        description: "Thank you for sharing your experience.",
-      });
+      const reviewToReturn = {
+        id: reviewData.id,
+        userName: profile?.username || user.email?.split('@')[0] || 'Anonymous',
+        rating: reviewData.rating,
+        comment: reviewData.comment,
+        date: reviewData.created_at,
+        image_url: reviewData.image_url,
+        likes: 0
+      };
 
-      onReviewSubmitted?.();
-      onClose();
+      onReviewSubmitted(reviewToReturn);
     } catch (error) {
       console.error('Error submitting review:', error);
       toast({
@@ -95,8 +122,6 @@ export const ReviewForm = ({ restaurantId, restaurantName, onClose, onReviewSubm
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="text-lg font-semibold">Review {restaurantName}</h3>
-      
       <div className="flex items-center space-x-2">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star

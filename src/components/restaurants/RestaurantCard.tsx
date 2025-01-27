@@ -4,6 +4,7 @@ import { Star, MessageSquare, ThumbsUp, MapPin } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -47,11 +48,9 @@ export const RestaurantCard = ({
   likes = 0,
 }: RestaurantCardProps) => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [isWritingReview, setIsWritingReview] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [localLikes, setLocalLikes] = useState(likes);
   const [localReviews, setLocalReviews] = useState(reviews);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [session, setSession] = useState(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -98,14 +97,14 @@ export const RestaurantCard = ({
       toast({
         title: "Authentication required",
         description: "Please sign up or log in to write a review",
+        variant: "destructive",
       });
       navigate('/auth');
       return;
     }
-    setIsWritingReview(true);
+    setIsReviewOpen(true);
   };
 
-  // Mock menu data (you can replace this with real data from your backend)
   const menuSections = [
     {
       name: "Appetizers",
@@ -172,9 +171,9 @@ export const RestaurantCard = ({
           </div>
         </DialogTrigger>
         <DialogContent className="max-w-2xl">
+          <DialogTitle className="text-2xl font-bold">{name}</DialogTitle>
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">{name}</h2>
               <div className="flex items-center gap-2 text-gray-600 mt-2">
                 <MapPin className="w-4 h-4" />
                 <p>{address}</p>
@@ -253,24 +252,20 @@ export const RestaurantCard = ({
 
       <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
         <DialogContent>
-          {isWritingReview ? (
-            <ReviewForm
-              restaurantId={id}
-              restaurantName={name}
-              onClose={() => {
-                setIsWritingReview(false);
-                setIsReviewOpen(false);
-              }}
-              onReviewSubmitted={() => {
-                setIsWritingReview(false);
-                setIsReviewOpen(false);
-                toast({
-                  title: "Review submitted!",
-                  description: "Thank you for sharing your experience.",
-                });
-              }}
-            />
-          ) : null}
+          <DialogTitle>Write a Review</DialogTitle>
+          <ReviewForm
+            restaurantId={id}
+            restaurantName={name}
+            onClose={() => setIsReviewOpen(false)}
+            onReviewSubmitted={(newReview) => {
+              setLocalReviews(prev => [...prev, newReview]);
+              setIsReviewOpen(false);
+              toast({
+                title: "Review submitted!",
+                description: "Thank you for sharing your experience.",
+              });
+            }}
+          />
         </DialogContent>
       </Dialog>
     </Card>
