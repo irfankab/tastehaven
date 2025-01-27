@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, Upload } from "lucide-react";
+import { Star, Upload, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -22,16 +22,23 @@ export const ReviewForm = ({
   const [comment, setComment] = useState("");
   const [hoveredStar, setHoveredStar] = useState(0);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "Error",
+          description: "Image size should be less than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
       setSelectedImage(file);
       
-      // Create preview URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -42,20 +49,35 @@ export const ReviewForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rating || !comment) {
+    if (!rating) {
       toast({
         title: "Error",
-        description: "Please provide both a rating and a comment",
+        description: "Please provide a rating",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!comment.trim()) {
+      toast({
+        title: "Error",
+        description: "Please provide a comment",
         variant: "destructive",
       });
       return;
     }
 
-    setIsUploading(true);
+    setIsSubmitting(true);
 
     try {
       const user = (await supabase.auth.getUser()).data.user;
-      if (!user) throw new Error("User not authenticated");
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Please sign in to submit a review",
+          variant: "destructive",
+        });
+        return;
+      }
 
       let imageUrl = null;
       if (selectedImage) {
@@ -81,17 +103,15 @@ export const ReviewForm = ({
         .eq('id', user.id)
         .single();
 
-      const newReview = {
-        restaurant_id: restaurantId,
-        user_id: user.id,
-        rating,
-        comment,
-        image_url: imageUrl
-      };
-
       const { error: insertError, data: reviewData } = await supabase
         .from('reviews')
-        .insert(newReview)
+        .insert({
+          restaurant_id: restaurantId,
+          user_id: user.id,
+          rating,
+          comment,
+          image_url: imageUrl
+        })
         .select()
         .single();
 
@@ -108,6 +128,11 @@ export const ReviewForm = ({
       };
 
       onReviewSubmitted(reviewToReturn);
+      toast({
+        title: "Success",
+        description: "Your review has been submitted",
+      });
+      onClose();
     } catch (error) {
       console.error('Error submitting review:', error);
       toast({
@@ -116,7 +141,7 @@ export const ReviewForm = ({
         variant: "destructive",
       });
     } finally {
-      setIsUploading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -188,9 +213,17 @@ export const ReviewForm = ({
         </Button>
         <Button 
           type="submit" 
-          disabled={!rating || !comment || isUploading}
+          disabled={isSubmitting}
+          className="relative"
         >
-          {isUploading ? "Uploading..." : "Submit Review"}
+          {isSubmitting ? (
+            <>
+              <Loader className="w-4 h-4 animate-spin" />
+              <span className="ml-2">Submitting...</span>
+            </>
+          ) : (
+            "Submit Review"
+          )}
         </Button>
       </div>
     </form>

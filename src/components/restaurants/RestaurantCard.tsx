@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,15 @@ export const RestaurantCard = ({
   }, []);
 
   const handleLikeRestaurant = () => {
+    if (!session) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to like restaurants",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
     setLocalLikes(prev => prev + 1);
     toast({
       title: "Restaurant liked!",
@@ -78,6 +88,15 @@ export const RestaurantCard = ({
   };
 
   const handleLikeReview = (reviewId: number) => {
+    if (!session) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to like reviews",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
     setLocalReviews(prevReviews =>
       prevReviews.map(review =>
         review.id === reviewId
@@ -252,7 +271,10 @@ export const RestaurantCard = ({
 
       <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
         <DialogContent>
-          <DialogTitle>Write a Review</DialogTitle>
+          <DialogTitle>Write a Review for {name}</DialogTitle>
+          <DialogDescription>
+            Share your experience and help others make informed decisions
+          </DialogDescription>
           <ReviewForm
             restaurantId={id}
             restaurantName={name}
