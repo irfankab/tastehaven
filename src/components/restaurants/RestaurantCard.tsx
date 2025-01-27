@@ -70,7 +70,7 @@ export const RestaurantCard = ({
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLikeRestaurant = () => {
+  const handleLikeRestaurant = async () => {
     if (!session) {
       toast({
         title: "Authentication required",
@@ -80,14 +80,24 @@ export const RestaurantCard = ({
       navigate('/auth');
       return;
     }
-    setLocalLikes(prev => prev + 1);
-    toast({
-      title: "Restaurant liked!",
-      description: `You liked ${name}`,
-    });
+
+    try {
+      // Here you would typically update the likes in your database
+      setLocalLikes(prev => prev + 1);
+      toast({
+        title: "Success",
+        description: `You liked ${name}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to like restaurant. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleLikeReview = (reviewId: number) => {
+  const handleLikeReview = async (reviewId: number) => {
     if (!session) {
       toast({
         title: "Authentication required",
@@ -97,17 +107,27 @@ export const RestaurantCard = ({
       navigate('/auth');
       return;
     }
-    setLocalReviews(prevReviews =>
-      prevReviews.map(review =>
-        review.id === reviewId
-          ? { ...review, likes: (review.likes || 0) + 1 }
-          : review
-      )
-    );
-    toast({
-      title: "Review liked!",
-      description: "Thanks for your feedback",
-    });
+
+    try {
+      // Here you would typically update the review likes in your database
+      setLocalReviews(prevReviews =>
+        prevReviews.map(review =>
+          review.id === reviewId
+            ? { ...review, likes: (review.likes || 0) + 1 }
+            : review
+        )
+      );
+      toast({
+        title: "Success",
+        description: "Thanks for your feedback",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to like review. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleReviewClick = (e: React.MouseEvent) => {

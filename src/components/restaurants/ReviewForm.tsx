@@ -26,10 +26,30 @@ export const ReviewForm = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const validateForm = () => {
+    if (!rating) {
+      toast({
+        title: "Error",
+        description: "Please provide a rating",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!comment.trim()) {
+      toast({
+        title: "Error",
+        description: "Please provide a comment",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "Error",
           description: "Image size should be less than 5MB",
@@ -49,28 +69,15 @@ export const ReviewForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rating) {
-      toast({
-        title: "Error",
-        description: "Please provide a rating",
-        variant: "destructive",
-      });
-      return;
-    }
-    if (!comment.trim()) {
-      toast({
-        title: "Error",
-        description: "Please provide a comment",
-        variant: "destructive",
-      });
-      return;
-    }
+    
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
 
     try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
         toast({
           title: "Error",
           description: "Please sign in to submit a review",
@@ -84,11 +91,18 @@ export const ReviewForm = ({
         const fileExt = selectedImage.name.split('.').pop();
         const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('restaurant-images')
           .upload(filePath, selectedImage);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          toast({
+            title: "Error",
+            description: "Failed to upload image. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
 
         const { data: { publicUrl } } = supabase.storage
           .from('restaurant-images')
@@ -115,7 +129,14 @@ export const ReviewForm = ({
         .select()
         .single();
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        toast({
+          title: "Error",
+          description: "Failed to submit review. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const reviewToReturn = {
         id: reviewData.id,
