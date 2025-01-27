@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 
 interface Review {
-  id: number;
+  id: string; // Changed from number to string to match Supabase UUID
   userName: string;
   rating: number;
   comment: string;
@@ -145,7 +145,7 @@ export const RestaurantCard = ({
     }
   };
 
-  const handleLikeReview = async (reviewId: number) => {
+  const handleLikeReview = async (reviewId: string) => {
     if (!session) {
       toast({
         title: "Authentication required",
