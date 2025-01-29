@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -57,8 +57,12 @@ const Messages = () => {
       const { data, error } = await supabase
         .from("messages")
         .select(`
-          *,
-          sender:sender_id (
+          id,
+          content,
+          sender_id,
+          receiver_id,
+          created_at,
+          sender:profiles!messages_sender_id_fkey (
             username,
             avatar_url
           )
