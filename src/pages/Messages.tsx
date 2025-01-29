@@ -13,7 +13,7 @@ interface Message {
   sender_id: string;
   receiver_id: string;
   created_at: string;
-  profiles: {
+  sender: {
     username: string;
     avatar_url: string;
   };
@@ -58,7 +58,7 @@ const Messages = () => {
         .from("messages")
         .select(`
           *,
-          profiles:sender_id (
+          sender:sender_id (
             username,
             avatar_url
           )
