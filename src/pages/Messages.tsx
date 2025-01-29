@@ -58,7 +58,10 @@ const Messages = () => {
         .from("messages")
         .select(`
           *,
-          profiles:sender_id(username, avatar_url)
+          profiles:sender_id (
+            username,
+            avatar_url
+          )
         `)
         .or(`sender_id.eq.${currentUser.user.id},receiver_id.eq.${currentUser.user.id}`)
         .order("created_at", { ascending: true });
