@@ -41,7 +41,7 @@ export const AuthForm = ({ defaultMode = 'login' }: AuthFormProps) => {
         toast.success("Logged in successfully!");
         navigate("/");
       } else {
-        const { error: signUpError, data } = await supabase.auth.signUp({
+        const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -73,65 +73,86 @@ export const AuthForm = ({ defaultMode = 'login' }: AuthFormProps) => {
   };
 
   return (
-    <Card className="w-full backdrop-blur-sm bg-white/80 border-none shadow-xl">
-      <CardHeader>
-        <CardTitle className="text-2xl text-center">
+    <Card className="w-full backdrop-blur-sm bg-white/90 border-none shadow-xl transition-all duration-300 hover:shadow-2xl">
+      <CardHeader className="space-y-2">
+        <CardTitle className="text-2xl sm:text-3xl text-center font-bold">
           {isLogin ? "Welcome Back" : "Join TasteHaven"}
         </CardTitle>
+        <p className="text-center text-gray-600">
+          {isLogin ? "Sign in to your account" : "Create your account"}
+        </p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="bg-white/50"
-            disabled={isLoading}
-          />
-          {!isLogin && (
+          <div className="space-y-2">
             <Input
-              type="text"
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-white/50"
+              className="bg-white/50 h-12 text-lg transition-all duration-200 focus:bg-white"
               disabled={isLoading}
             />
-          )}
-          <Input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="bg-white/50"
-            disabled={isLoading}
-          />
+          </div>
           {!isLogin && (
+            <div className="space-y-2">
+              <Input
+                type="text"
+                placeholder="Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                className="bg-white/50 h-12 text-lg transition-all duration-200 focus:bg-white"
+                disabled={isLoading}
+              />
+            </div>
+          )}
+          <div className="space-y-2">
             <Input
               type="password"
-              placeholder="Verify Password"
-              value={verifyPassword}
-              onChange={(e) => setVerifyPassword(e.target.value)}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
-              className="bg-white/50"
+              className="bg-white/50 h-12 text-lg transition-all duration-200 focus:bg-white"
               disabled={isLoading}
             />
+          </div>
+          {!isLogin && (
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Verify Password"
+                value={verifyPassword}
+                onChange={(e) => setVerifyPassword(e.target.value)}
+                required
+                className="bg-white/50 h-12 text-lg transition-all duration-200 focus:bg-white"
+                disabled={isLoading}
+              />
+            </div>
           )}
           <Button 
             type="submit" 
-            className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
+            className="w-full h-12 text-lg bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
             disabled={isLoading}
           >
-            {isLogin ? "Login" : "Sign Up"}
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </span>
+            ) : (
+              isLogin ? "Sign In" : "Create Account"
+            )}
           </Button>
           <Button
             type="button"
             variant="ghost"
-            className="w-full hover:bg-white/10"
+            className="w-full hover:bg-white/10 text-gray-700 hover:text-gray-900 transition-all duration-200"
             onClick={() => {
               setIsLogin(!isLogin);
               setPassword("");
@@ -139,7 +160,7 @@ export const AuthForm = ({ defaultMode = 'login' }: AuthFormProps) => {
             }}
             disabled={isLoading}
           >
-            {isLogin ? "Need an account? Sign up" : "Already have an account? Login"}
+            {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
           </Button>
         </form>
       </CardContent>
