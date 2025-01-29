@@ -17,7 +17,7 @@ const MOCK_RESTAURANTS = [
     likes: 24,
     reviews: [
       {
-        id: "1", // Changed from number to string
+        id: "1",
         userName: "John Doe",
         rating: 4.5,
         comment: "Amazing pasta and great service!",
