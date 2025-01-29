@@ -17,7 +17,7 @@ const MOCK_RESTAURANTS = [
     likes: 24,
     reviews: [
       {
-        id: "1",
+        id: "1", // Changed from number to string
         userName: "John Doe",
         rating: 4.5,
         comment: "Amazing pasta and great service!",
@@ -37,7 +37,7 @@ const MOCK_RESTAURANTS = [
     likes: 42,
     reviews: [
       {
-        id: 2,
+        id: "2", // Changed from number to string
         userName: "Mike Johnson",
         rating: 5.0,
         comment: "Best sushi in town! Fresh and delicious.",
@@ -57,7 +57,7 @@ const MOCK_RESTAURANTS = [
     likes: 18,
     reviews: [
       {
-        id: 3,
+        id: "3", // Changed from number to string
         userName: "David Wilson",
         rating: 4.0,
         comment: "Juicy burgers and crispy fries!",
@@ -77,7 +77,7 @@ const MOCK_RESTAURANTS = [
     likes: 31,
     reviews: [
       {
-        id: 4,
+        id: "4", // Changed from number to string
         userName: "Maria Garcia",
         rating: 4.5,
         comment: "Authentic Mexican flavors! Love the street tacos.",
@@ -97,7 +97,7 @@ const MOCK_RESTAURANTS = [
     likes: 28,
     reviews: [
       {
-        id: 5,
+        id: "5", // Changed from number to string
         userName: "Sarah Lee",
         rating: 5.0,
         comment: "Perfect spice levels and great variety!",
@@ -117,7 +117,7 @@ const MOCK_RESTAURANTS = [
     likes: 22,
     reviews: [
       {
-        id: 6,
+        id: "6", // Changed from number to string
         userName: "Alex Brown",
         rating: 4.5,
         comment: "Fresh ingredients and amazing hummus!",
@@ -137,7 +137,7 @@ const MOCK_RESTAURANTS = [
     likes: 35,
     reviews: [
       {
-        id: 7,
+        id: "7", // Changed from number to string
         userName: "Raj Patel",
         rating: 4.5,
         comment: "Authentic Indian flavors, great naan bread!",
@@ -153,11 +153,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.9,
     imageUrl: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
     priceRange: "$$$$",
-    address: "258 Steak St, New York, NY 10008",
+    address: "852 Steak St, New York, NY 10008",
     likes: 45,
     reviews: [
       {
-        id: 8,
+        id: "8", // Changed from number to string
         userName: "James Smith",
         rating: 5.0,
         comment: "Best steaks in town, amazing service!",
@@ -173,11 +173,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
     priceRange: "$$",
-    address: "369 Dim Sum St, New York, NY 10009",
+    address: "753 Dim Sum Blvd, New York, NY 10009",
     likes: 29,
     reviews: [
       {
-        id: 9,
+        id: "9", // Changed from number to string
         userName: "Lucy Chen",
         rating: 4.5,
         comment: "Authentic dim sum experience!",
@@ -193,11 +193,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.7,
     imageUrl: "https://images.unsplash.com/photo-1452378174528-3090a4bba7b2",
     priceRange: "$$$",
-    address: "741 French St, New York, NY 10010",
+    address: "246 French St, New York, NY 10010",
     likes: 38,
     reviews: [
       {
-        id: 10,
+        id: "10", // Changed from number to string
         userName: "Sophie Martin",
         rating: 5.0,
         comment: "Feels like Paris! Amazing atmosphere.",
@@ -213,11 +213,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.4,
     imageUrl: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
     priceRange: "$$",
-    address: "852 BBQ Blvd, New York, NY 10011",
+    address: "369 BBQ Rd, New York, NY 10011",
     likes: 32,
     reviews: [
       {
-        id: 11,
+        id: "11", // Changed from number to string
         userName: "Tom Baker",
         rating: 4.5,
         comment: "Great BBQ, friendly staff!",
@@ -233,11 +233,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
     priceRange: "$$$",
-    address: "963 Seafood St, New York, NY 10012",
+    address: "852 Seafood St, New York, NY 10012",
     likes: 41,
     reviews: [
       {
-        id: 12,
+        id: "12", // Changed from number to string
         userName: "Emma Wilson",
         rating: 4.5,
         comment: "Fresh seafood, great ocean view!",
@@ -253,11 +253,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.3,
     imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c",
     priceRange: "$$",
-    address: "147 Vegan Ave, New York, NY 10013",
+    address: "963 Vegan Ave, New York, NY 10013",
     likes: 25,
     reviews: [
       {
-        id: 13,
+        id: "13", // Changed from number to string
         userName: "Olivia Green",
         rating: 4.5,
         comment: "Creative vegan dishes, love it!",
@@ -273,11 +273,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1565299543923-37dd37887442",
     priceRange: "$$$",
-    address: "258 Korean BBQ Rd, New York, NY 10014",
+    address: "147 Korean BBQ Rd, New York, NY 10014",
     likes: 47,
     reviews: [
       {
-        id: 14,
+        id: "14", // Changed from number to string
         userName: "Jin Kim",
         rating: 5.0,
         comment: "Authentic Korean BBQ experience!",
@@ -293,11 +293,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
     priceRange: "$$",
-    address: "369 Pizza St, New York, NY 10015",
+    address: "258 Pizza St, New York, NY 10015",
     likes: 33,
     reviews: [
       {
-        id: 15,
+        id: "15", // Changed from number to string
         userName: "Marco Romano",
         rating: 4.5,
         comment: "Best Neapolitan pizza in town!",
@@ -313,11 +313,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b",
     priceRange: "$$",
-    address: "741 Greek St, New York, NY 10016",
+    address: "369 Greek St, New York, NY 10016",
     likes: 36,
     reviews: [
       {
-        id: 16,
+        id: "16", // Changed from number to string
         userName: "Nick Stavros",
         rating: 5.0,
         comment: "Amazing gyros and moussaka!",
@@ -333,11 +333,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.7,
     imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947",
     priceRange: "$$",
-    address: "852 Ramen Rd, New York, NY 10017",
+    address: "741 Ramen Rd, New York, NY 10017",
     likes: 39,
     reviews: [
       {
-        id: 17,
+        id: "17", // Changed from number to string
         userName: "Yuki Tanaka",
         rating: 5.0,
         comment: "Best ramen in the city!",
@@ -353,11 +353,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.8,
     imageUrl: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
     priceRange: "$$$",
-    address: "963 Brazilian Rd, New York, NY 10018",
+    address: "852 Brazilian Rd, New York, NY 10018",
     likes: 44,
     reviews: [
       {
-        id: 18,
+        id: "18", // Changed from number to string
         userName: "Carlos Silva",
         rating: 5.0,
         comment: "Amazing churrasco experience!",
@@ -373,11 +373,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     imageUrl: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
     priceRange: "$$",
-    address: "147 Spanish St, New York, NY 10019",
+    address: "963 Spanish St, New York, NY 10019",
     likes: 31,
     reviews: [
       {
-        id: 19,
+        id: "19", // Changed from number to string
         userName: "Ana Rodriguez",
         rating: 4.5,
         comment: "Authentic tapas, great sangria!",
@@ -393,11 +393,11 @@ const MOCK_RESTAURANTS = [
     rating: 4.6,
     imageUrl: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
     priceRange: "$",
-    address: "258 Pho Rd, New York, NY 10020",
+    address: "159 Pho St, New York, NY 10020",
     likes: 34,
     reviews: [
       {
-        id: 20,
+        id: "20", // Changed from number to string
         userName: "Tran Nguyen",
         rating: 5.0,
         comment: "Best pho in town, very authentic!",
