@@ -39,31 +39,42 @@ export const Header = ({ onSearch }: { onSearch?: (query: string) => void }) => 
           )}
 
           <nav className="flex items-center space-x-4">
-            <button className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-full transition-colors">
-              Write a Review
-            </button>
-            {!session ? (
+            {session ? (
               <>
-                <Link 
-                  to="/auth" 
+                <Link
+                  to="/messages"
+                  className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-full transition-colors"
+                >
+                  Messages
+                </Link>
+                <Link
+                  to="/friends"
+                  className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-full transition-colors"
+                >
+                  Friends
+                </Link>
+                <button
+                  onClick={() => supabase.auth.signOut()}
+                  className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-full transition-colors"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/auth"
                   className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-full transition-colors"
                 >
                   Log In
                 </Link>
-                <Link 
-                  to="/auth?mode=signup" 
+                <Link
+                  to="/auth?mode=signup"
                   className="bg-primary text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg"
                 >
                   Sign Up
                 </Link>
               </>
-            ) : (
-              <button 
-                onClick={() => supabase.auth.signOut()} 
-                className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-full transition-colors"
-              >
-                Sign Out
-              </button>
             )}
           </nav>
         </div>
