@@ -26,7 +26,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "2", // Changed from number to string
+    id: "2",
     name: "Sushi Master",
     cuisine: "Japanese",
     rating: 4.8,
@@ -36,7 +36,7 @@ const MOCK_RESTAURANTS = [
     likes: 42,
     reviews: [
       {
-        id: 2,
+        id: "2",
         userName: "Mike Johnson",
         rating: 5.0,
         comment: "Best sushi in town! Fresh and delicious.",
@@ -46,7 +46,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "3", // Changed from number to string
+    id: "3",
     name: "Burger Haven",
     cuisine: "American",
     rating: 4.2,
@@ -56,7 +56,7 @@ const MOCK_RESTAURANTS = [
     likes: 18,
     reviews: [
       {
-        id: 3,
+        id: "3",
         userName: "David Wilson",
         rating: 4.0,
         comment: "Juicy burgers and crispy fries!",
@@ -66,7 +66,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "4", // Changed from number to string
+    id: "4",
     name: "Taco Fiesta",
     cuisine: "Mexican",
     rating: 4.6,
@@ -76,7 +76,7 @@ const MOCK_RESTAURANTS = [
     likes: 31,
     reviews: [
       {
-        id: 4,
+        id: "4",
         userName: "Maria Garcia",
         rating: 4.5,
         comment: "Authentic Mexican flavors! Love the street tacos.",
@@ -86,7 +86,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "5", // Changed from number to string
+    id: "5",
     name: "Thai Spice",
     cuisine: "Thai",
     rating: 4.7,
@@ -96,7 +96,7 @@ const MOCK_RESTAURANTS = [
     likes: 28,
     reviews: [
       {
-        id: 5,
+        id: "5",
         userName: "Sarah Lee",
         rating: 5.0,
         comment: "Perfect spice levels and great variety!",
@@ -106,7 +106,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "6", // Changed from number to string
+    id: "6",
     name: "Mediterranean Delight",
     cuisine: "Mediterranean",
     rating: 4.4,
@@ -116,7 +116,7 @@ const MOCK_RESTAURANTS = [
     likes: 22,
     reviews: [
       {
-        id: 6,
+        id: "6",
         userName: "Alex Brown",
         rating: 4.5,
         comment: "Fresh ingredients and amazing hummus!",
@@ -126,7 +126,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "7", // Changed from number to string
+    id: "7",
     name: "Curry House",
     cuisine: "Indian",
     rating: 4.6,
@@ -136,7 +136,7 @@ const MOCK_RESTAURANTS = [
     likes: 35,
     reviews: [
       {
-        id: 7,
+        id: "7",
         userName: "Raj Patel",
         rating: 4.5,
         comment: "Authentic Indian flavors, great naan bread!",
@@ -146,7 +146,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "8", // Changed from number to string
+    id: "8",
     name: "The Steakhouse",
     cuisine: "American",
     rating: 4.9,
@@ -156,7 +156,7 @@ const MOCK_RESTAURANTS = [
     likes: 45,
     reviews: [
       {
-        id: 8,
+        id: "8",
         userName: "James Smith",
         rating: 5.0,
         comment: "Best steaks in town, amazing service!",
@@ -166,7 +166,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "9", // Changed from number to string
+    id: "9",
     name: "Dim Sum Paradise",
     cuisine: "Chinese",
     rating: 4.5,
@@ -176,7 +176,7 @@ const MOCK_RESTAURANTS = [
     likes: 29,
     reviews: [
       {
-        id: 9,
+        id: "9",
         userName: "Lucy Chen",
         rating: 4.5,
         comment: "Authentic dim sum experience!",
@@ -186,7 +186,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "10", // Changed from number to string
+    id: "10",
     name: "French Bistro",
     cuisine: "French",
     rating: 4.7,
@@ -196,7 +196,7 @@ const MOCK_RESTAURANTS = [
     likes: 38,
     reviews: [
       {
-        id: 10,
+        id: "10",
         userName: "Sophie Martin",
         rating: 5.0,
         comment: "Feels like Paris! Amazing atmosphere.",
@@ -206,7 +206,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "11", // Changed from number to string
+    id: "11",
     name: "BBQ Ranch",
     cuisine: "American",
     rating: 4.4,
@@ -216,7 +216,7 @@ const MOCK_RESTAURANTS = [
     likes: 32,
     reviews: [
       {
-        id: 11,
+        id: "11",
         userName: "Tom Baker",
         rating: 4.5,
         comment: "Great BBQ, friendly staff!",
@@ -226,7 +226,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "12", // Changed from number to string
+    id: "12",
     name: "Seafood Harbor",
     cuisine: "Seafood",
     rating: 4.6,
@@ -236,7 +236,7 @@ const MOCK_RESTAURANTS = [
     likes: 41,
     reviews: [
       {
-        id: 12,
+        id: "12",
         userName: "Emma Wilson",
         rating: 4.5,
         comment: "Fresh seafood, great ocean view!",
@@ -246,7 +246,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "13", // Changed from number to string
+    id: "13",
     name: "Vegan Delight",
     cuisine: "Vegan",
     rating: 4.3,
@@ -256,7 +256,7 @@ const MOCK_RESTAURANTS = [
     likes: 25,
     reviews: [
       {
-        id: 13,
+        id: "13",
         userName: "Olivia Green",
         rating: 4.5,
         comment: "Creative vegan dishes, love it!",
@@ -266,7 +266,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "14", // Changed from number to string
+    id: "14",
     name: "Korean BBQ House",
     cuisine: "Korean",
     rating: 4.8,
@@ -276,7 +276,7 @@ const MOCK_RESTAURANTS = [
     likes: 47,
     reviews: [
       {
-        id: 14,
+        id: "14",
         userName: "Jin Kim",
         rating: 5.0,
         comment: "Authentic Korean BBQ experience!",
@@ -286,7 +286,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "15", // Changed from number to string
+    id: "15",
     name: "Pizza Paradise",
     cuisine: "Italian",
     rating: 4.5,
@@ -296,7 +296,7 @@ const MOCK_RESTAURANTS = [
     likes: 33,
     reviews: [
       {
-        id: 15,
+        id: "15",
         userName: "Marco Romano",
         rating: 4.5,
         comment: "Best Neapolitan pizza in town!",
@@ -306,7 +306,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "16", // Changed from number to string
+    id: "16",
     name: "Greek Taverna",
     cuisine: "Greek",
     rating: 4.6,
@@ -316,7 +316,7 @@ const MOCK_RESTAURANTS = [
     likes: 36,
     reviews: [
       {
-        id: 16,
+        id: "16",
         userName: "Nick Stavros",
         rating: 5.0,
         comment: "Amazing gyros and moussaka!",
@@ -326,7 +326,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "17", // Changed from number to string
+    id: "17",
     name: "Ramen Shop",
     cuisine: "Japanese",
     rating: 4.7,
@@ -336,7 +336,7 @@ const MOCK_RESTAURANTS = [
     likes: 39,
     reviews: [
       {
-        id: 17,
+        id: "17",
         userName: "Yuki Tanaka",
         rating: 5.0,
         comment: "Best ramen in the city!",
@@ -346,7 +346,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "18", // Changed from number to string
+    id: "18",
     name: "Brazilian Steakhouse",
     cuisine: "Brazilian",
     rating: 4.8,
@@ -356,7 +356,7 @@ const MOCK_RESTAURANTS = [
     likes: 44,
     reviews: [
       {
-        id: 18,
+        id: "18",
         userName: "Carlos Silva",
         rating: 5.0,
         comment: "Amazing churrasco experience!",
@@ -366,7 +366,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "19", // Changed from number to string
+    id: "19",
     name: "Spanish Tapas",
     cuisine: "Spanish",
     rating: 4.5,
@@ -376,7 +376,7 @@ const MOCK_RESTAURANTS = [
     likes: 31,
     reviews: [
       {
-        id: 19,
+        id: "19",
         userName: "Ana Rodriguez",
         rating: 4.5,
         comment: "Authentic tapas, great sangria!",
@@ -386,7 +386,7 @@ const MOCK_RESTAURANTS = [
     ]
   },
   {
-    id: "20", // Changed from number to string
+    id: "20",
     name: "Vietnamese Pho",
     cuisine: "Vietnamese",
     rating: 4.6,
@@ -396,7 +396,7 @@ const MOCK_RESTAURANTS = [
     likes: 34,
     reviews: [
       {
-        id: 20,
+        id: "20",
         userName: "Tran Nguyen",
         rating: 5.0,
         comment: "Best pho in town, very authentic!",
