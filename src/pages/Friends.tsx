@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Header } from "@/components/layout/Header";
 
 interface Profile {
   id: string;
@@ -20,17 +21,36 @@ interface Friendship {
 const Friends = () => {
   const [users, setUsers] = useState<Profile[]>([]);
   const [friendships, setFriendships] = useState<Friendship[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) {
+        toast({
+          title: "Error fetching current user",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+      if (user) {
+        setCurrentUserId(user.id);
+      }
+    };
+
+    fetchCurrentUser();
+  }, [toast]);
+
+  useEffect(() => {
     const fetchUsers = async () => {
-      const { data: currentUser } = await supabase.auth.getUser();
-      if (!currentUser.user) return;
+      if (!currentUserId) return;
 
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select("*")
-        .neq("id", currentUser.user.id);
+        .neq("id", currentUserId);
 
       if (error) {
         toast({
@@ -45,13 +65,12 @@ const Friends = () => {
     };
 
     const fetchFriendships = async () => {
-      const { data: currentUser } = await supabase.auth.getUser();
-      if (!currentUser.user) return;
+      if (!currentUserId) return;
 
       const { data, error } = await supabase
         .from("friendships")
         .select("*")
-        .or(`user_id.eq.${currentUser.user.id},friend_id.eq.${currentUser.user.id}`);
+        .or(`user_id.eq.${currentUserId},friend_id.eq.${currentUserId}`);
 
       if (error) {
         toast({
@@ -65,36 +84,37 @@ const Friends = () => {
       setFriendships(data || []);
     };
 
-    fetchUsers();
-    fetchFriendships();
+    if (currentUserId) {
+      fetchUsers();
+      fetchFriendships();
 
-    // Subscribe to friendship changes
-    const channel = supabase
-      .channel("friendships_channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "friendships",
-        },
-        () => {
-          fetchFriendships();
-        }
-      )
-      .subscribe();
+      // Subscribe to friendship changes
+      const channel = supabase
+        .channel("friendships_channel")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "friendships",
+          },
+          () => {
+            fetchFriendships();
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [toast]);
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [currentUserId, toast]);
 
   const followUser = async (userId: string) => {
-    const { data: currentUser } = await supabase.auth.getUser();
-    if (!currentUser.user) return;
+    if (!currentUserId) return;
 
     const { error } = await supabase.from("friendships").insert({
-      user_id: currentUser.user.id,
+      user_id: currentUserId,
       friend_id: userId,
       status: "following",
     });
@@ -114,12 +134,11 @@ const Friends = () => {
   };
 
   const unfollowUser = async (userId: string) => {
-    const { data: currentUser } = await supabase.auth.getUser();
-    if (!currentUser.user) return;
+    if (!currentUserId) return;
 
     const friendship = friendships.find(
       (f) =>
-        f.user_id === currentUser.user.id &&
+        f.user_id === currentUserId &&
         f.friend_id === userId
     );
 
@@ -145,40 +164,42 @@ const Friends = () => {
   };
 
   const isFollowing = (userId: string) => {
-    const { data: currentUser } = supabase.auth.getUser();
-    if (!currentUser.user) return false;
+    if (!currentUserId) return false;
 
     return friendships.some(
       (f) =>
-        f.user_id === currentUser.user?.id &&
+        f.user_id === currentUserId &&
         f.friend_id === userId &&
         f.status === "following"
     );
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-6">Users</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {users.map((user) => (
-          <Card key={user.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold">{user.username}</h3>
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="container mx-auto p-4 max-w-4xl">
+        <h1 className="text-2xl font-bold mb-6">Users</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {users.map((user) => (
+            <Card key={user.id} className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold">{user.username}</h3>
+                </div>
+                <Button
+                  variant={isFollowing(user.id) ? "destructive" : "default"}
+                  onClick={() =>
+                    isFollowing(user.id)
+                      ? unfollowUser(user.id)
+                      : followUser(user.id)
+                  }
+                >
+                  {isFollowing(user.id) ? "Unfollow" : "Follow"}
+                </Button>
               </div>
-              <Button
-                variant={isFollowing(user.id) ? "destructive" : "default"}
-                onClick={() =>
-                  isFollowing(user.id)
-                    ? unfollowUser(user.id)
-                    : followUser(user.id)
-                }
-              >
-                {isFollowing(user.id) ? "Unfollow" : "Follow"}
-              </Button>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );

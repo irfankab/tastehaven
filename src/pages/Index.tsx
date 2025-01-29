@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const MOCK_RESTAURANTS = [
   {
-    id: "1", // Changed from number to string to match UUID format
+    id: "1",
     name: "The Italian Place",
     cuisine: "Italian",
     rating: 4.5,
@@ -16,7 +16,7 @@ const MOCK_RESTAURANTS = [
     likes: 24,
     reviews: [
       {
-        id: 1,
+        id: "1",
         userName: "John Doe",
         rating: 4.5,
         comment: "Amazing pasta and great service!",
