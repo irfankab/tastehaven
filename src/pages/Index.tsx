@@ -413,18 +413,23 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
+    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (!session) {
+        navigate('/auth');
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const filteredRestaurants = MOCK_RESTAURANTS.filter((restaurant) =>
     restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
