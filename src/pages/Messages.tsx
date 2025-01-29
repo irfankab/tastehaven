@@ -51,8 +51,8 @@ const Messages = () => {
     if (!selectedUser) return;
 
     const fetchMessages = async () => {
-      const { data: currentUser } = await supabase.auth.getUser();
-      if (!currentUser.user) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
       const { data, error } = await supabase
         .from("messages")
@@ -63,7 +63,7 @@ const Messages = () => {
             avatar_url
           )
         `)
-        .or(`sender_id.eq.${currentUser.user.id},receiver_id.eq.${currentUser.user.id}`)
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .order("created_at", { ascending: true });
 
       if (error) {
@@ -104,12 +104,12 @@ const Messages = () => {
   const sendMessage = async () => {
     if (!newMessage.trim() || !selectedUser) return;
 
-    const { data: currentUser } = await supabase.auth.getUser();
-    if (!currentUser.user) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
     const { error } = await supabase.from("messages").insert({
       content: newMessage,
-      sender_id: currentUser.user.id,
+      sender_id: user.id,
       receiver_id: selectedUser,
     });
 
