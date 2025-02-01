@@ -108,32 +108,50 @@ const Messages = () => {
 
     fetchMessages();
 
-    // Subscribe to new messages in real-time
-    const channel = supabase
-      .channel('messages_channel')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${selectedUser}`,
-        },
-        (payload) => {
-          console.log('New message received:', payload);
-          // Fetch the complete message with sender information
-          fetchMessages();
-        }
-      )
-      .subscribe((status) => {
-        console.log('Realtime subscription status:', status);
-        if (status === 'SUBSCRIBED') {
-          console.log('Successfully subscribed to real-time messages');
-        }
-      });
+    // Set up two real-time subscriptions - one for sent messages and one for received messages
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const channels = [
+      // Listen for messages sent to the selected user
+      supabase
+        .channel('messages_sent')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `sender_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('Sent message:', payload);
+            fetchMessages();
+          }
+        )
+        .subscribe(),
+
+      // Listen for messages received from the selected user
+      supabase
+        .channel('messages_received')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `receiver_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('Received message:', payload);
+            fetchMessages();
+          }
+        )
+        .subscribe()
+    ];
 
     return () => {
-      supabase.removeChannel(channel);
+      channels.forEach(channel => supabase.removeChannel(channel));
     };
   }, [selectedUser, toast]);
 
