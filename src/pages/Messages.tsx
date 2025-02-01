@@ -72,6 +72,53 @@ const Messages = () => {
   useEffect(() => {
     if (!selectedUser) return;
 
+    const setupRealtimeSubscriptions = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const channels = [
+        // Listen for messages sent to the selected user
+        supabase
+          .channel('messages_sent')
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'messages',
+              filter: `sender_id=eq.${user.id}`,
+            },
+            (payload) => {
+              console.log('Sent message:', payload);
+              fetchMessages();
+            }
+          )
+          .subscribe(),
+
+        // Listen for messages received from the selected user
+        supabase
+          .channel('messages_received')
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'messages',
+              filter: `receiver_id=eq.${user.id}`,
+            },
+            (payload) => {
+              console.log('Received message:', payload);
+              fetchMessages();
+            }
+          )
+          .subscribe()
+      ];
+
+      return () => {
+        channels.forEach(channel => supabase.removeChannel(channel));
+      };
+    };
+
     const fetchMessages = async () => {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -107,51 +154,10 @@ const Messages = () => {
     };
 
     fetchMessages();
-
-    // Set up two real-time subscriptions - one for sent messages and one for received messages
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const channels = [
-      // Listen for messages sent to the selected user
-      supabase
-        .channel('messages_sent')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `sender_id=eq.${user.id}`,
-          },
-          (payload) => {
-            console.log('Sent message:', payload);
-            fetchMessages();
-          }
-        )
-        .subscribe(),
-
-      // Listen for messages received from the selected user
-      supabase
-        .channel('messages_received')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `receiver_id=eq.${user.id}`,
-          },
-          (payload) => {
-            console.log('Received message:', payload);
-            fetchMessages();
-          }
-        )
-        .subscribe()
-    ];
-
+    const cleanup = setupRealtimeSubscriptions();
+    
     return () => {
-      channels.forEach(channel => supabase.removeChannel(channel));
+      cleanup.then(cleanupFn => cleanupFn && cleanupFn());
     };
   }, [selectedUser, toast]);
 
