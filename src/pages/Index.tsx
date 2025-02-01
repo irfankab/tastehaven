@@ -1,8 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
 import { Header } from "@/components/layout/Header";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+
+const Index = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
 const MOCK_RESTAURANTS = [
   {
@@ -407,29 +414,19 @@ const MOCK_RESTAURANTS = [
   }
 ];
 
-const Index = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [session, setSession] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (!session) {
-        navigate('/auth');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+  const handleExploreClick = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to explore restaurants",
+        variant: "default",
+      });
+      navigate('/auth');
+    } else {
+      navigate('/explore');
+    }
+  };
 
   const filteredRestaurants = MOCK_RESTAURANTS.filter((restaurant) =>
     restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -447,18 +444,27 @@ const Index = () => {
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="py-20 text-center">
-              <h2 className="text-5xl font-bold text-white mb-6 animate-fade-in tracking-tight drop-shadow-lg">
+              <h1 className="text-5xl font-bold text-white mb-6 animate-fade-in tracking-tight drop-shadow-lg">
                 Discover Your Next Favorite Spot
-              </h2>
+              </h1>
               <p className="text-xl text-white max-w-2xl mx-auto mb-8 animate-fade-in delay-100 drop-shadow-md">
                 Join our community of food lovers and explore the best dining experiences in your area
               </p>
-              <button 
-                onClick={() => navigate('/explore')}
-                className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-xl animate-fade-in delay-200"
-              >
-                Start Exploring
-              </button>
+              <div className="space-x-4">
+                <Button 
+                  onClick={handleExploreClick}
+                  className="bg-primary text-white px-8 py-6 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-xl animate-fade-in delay-200"
+                >
+                  Start Exploring
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/auth')}
+                  className="px-8 py-6 rounded-full font-semibold bg-white/10 text-white hover:bg-white/20 transition-all duration-300 shadow-xl animate-fade-in delay-300"
+                >
+                  Sign In
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -467,16 +473,16 @@ const Index = () => {
       <main className="relative bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Popular Restaurants
-            </h3>
+            </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Discover highly-rated restaurants with authentic reviews from our community
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredRestaurants.map((restaurant) => (
+            {filteredRestaurants.slice(0, 6).map((restaurant) => (
               <RestaurantCard key={restaurant.id} {...restaurant} />
             ))}
           </div>
@@ -493,7 +499,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">REVBD</h3>
+              <h3 className="text-xl font-bold mb-4">TasteHaven</h3>
               <p className="text-gray-400">Connecting food lovers with great restaurants</p>
             </div>
             <div>
