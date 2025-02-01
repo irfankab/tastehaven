@@ -108,21 +108,29 @@ const Messages = () => {
 
     fetchMessages();
 
-    // Subscribe to new messages
+    // Subscribe to new messages in real-time
     const channel = supabase
-      .channel("messages_channel")
+      .channel('messages_channel')
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${selectedUser}`,
         },
-        () => {
+        (payload) => {
+          console.log('New message received:', payload);
+          // Fetch the complete message with sender information
           fetchMessages();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('Successfully subscribed to real-time messages');
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
