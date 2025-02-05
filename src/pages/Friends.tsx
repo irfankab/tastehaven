@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"; 
 import { Header } from "@/components/layout/Header";
-import { Loader2 } from "lucide-react";
+import { Loader2, UserPlus, UserMinus, Check, X } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -18,7 +18,7 @@ interface Friendship {
   id: string;
   user_id: string;
   friend_id: string;
-  status: string;
+  status: 'pending' | 'accepted' | 'rejected';
 }
 
 const Friends = () => {
@@ -114,70 +114,28 @@ const Friends = () => {
     }
   }, [currentUserId, toast]);
 
-  const followUserByEmail = async (email: string) => {
+  const sendFriendRequest = async (userId: string) => {
+    if (!currentUserId) return;
+
     setIsLoading(true);
     try {
-      // First find the user by email
-      const { data: userToFollow, error: userError } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .eq("email", email)
-        .single();
-
-      if (userError || !userToFollow) {
-        toast({
-          title: "User not found",
-          description: "No user found with that email address",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (userToFollow.id === currentUserId) {
-        toast({
-          title: "Invalid action",
-          description: "You cannot follow yourself",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Check if already following
-      const isAlreadyFollowing = friendships.some(
-        (f) =>
-          f.user_id === currentUserId &&
-          f.friend_id === userToFollow.id
-      );
-
-      if (isAlreadyFollowing) {
-        toast({
-          title: "Already following",
-          description: "You are already following this user",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Create friendship
-      const { error: friendshipError } = await supabase
+      const { error } = await supabase
         .from("friendships")
         .insert({
           user_id: currentUserId,
-          friend_id: userToFollow.id,
-          status: "following",
+          friend_id: userId,
+          status: 'pending'
         });
 
-      if (friendshipError) throw friendshipError;
+      if (error) throw error;
 
       toast({
         title: "Success",
-        description: "You are now following this user",
+        description: "Friend request sent successfully",
       });
-      
-      setSearchEmail("");
     } catch (error: any) {
       toast({
-        title: "Error following user",
+        title: "Error sending friend request",
         description: error.message,
         variant: "destructive",
       });
@@ -186,45 +144,129 @@ const Friends = () => {
     }
   };
 
-  const unfollowUser = async (userId: string) => {
-    if (!currentUserId) return;
+  const handleFriendRequest = async (friendshipId: string, status: 'accepted' | 'rejected') => {
+    try {
+      const { error } = await supabase
+        .from("friendships")
+        .update({ status })
+        .eq("id", friendshipId);
 
-    const friendship = friendships.find(
-      (f) =>
-        f.user_id === currentUserId &&
-        f.friend_id === userId
-    );
+      if (error) throw error;
 
-    if (!friendship) return;
-
-    const { error } = await supabase
-      .from("friendships")
-      .delete()
-      .eq("id", friendship.id);
-
-    if (error) {
-      toast({
-        title: "Error unfollowing user",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
       toast({
         title: "Success",
-        description: "You have unfollowed this user",
+        description: `Friend request ${status}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error updating friend request",
+        description: error.message,
+        variant: "destructive",
       });
     }
   };
 
-  const isFollowing = (userId: string) => {
-    if (!currentUserId) return false;
+  const removeFriend = async (friendshipId: string) => {
+    try {
+      const { error } = await supabase
+        .from("friendships")
+        .delete()
+        .eq("id", friendshipId);
 
-    return friendships.some(
-      (f) =>
-        f.user_id === currentUserId &&
-        f.friend_id === userId &&
-        f.status === "following"
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Friend removed successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error removing friend",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getFriendshipStatus = (userId: string) => {
+    const friendship = friendships.find(
+      f => (f.user_id === currentUserId && f.friend_id === userId) ||
+           (f.user_id === userId && f.friend_id === currentUserId)
     );
+
+    if (!friendship) return null;
+
+    return {
+      id: friendship.id,
+      status: friendship.status,
+      isReceiver: friendship.friend_id === currentUserId
+    };
+  };
+
+  const renderFriendshipButton = (userId: string) => {
+    const friendship = getFriendshipStatus(userId);
+
+    if (!friendship) {
+      return (
+        <Button 
+          onClick={() => sendFriendRequest(userId)}
+          disabled={isLoading}
+          size="sm"
+        >
+          <UserPlus className="w-4 h-4 mr-2" />
+          Add Friend
+        </Button>
+      );
+    }
+
+    if (friendship.status === 'pending') {
+      if (friendship.isReceiver) {
+        return (
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => handleFriendRequest(friendship.id, 'accepted')}
+              variant="default"
+              size="sm"
+            >
+              <Check className="w-4 h-4 mr-2" />
+              Accept
+            </Button>
+            <Button 
+              onClick={() => handleFriendRequest(friendship.id, 'rejected')}
+              variant="destructive"
+              size="sm"
+            >
+              <X className="w-4 h-4 mr-2" />
+              Reject
+            </Button>
+          </div>
+        );
+      }
+      return (
+        <Button 
+          variant="secondary"
+          size="sm"
+          disabled
+        >
+          Pending
+        </Button>
+      );
+    }
+
+    if (friendship.status === 'accepted') {
+      return (
+        <Button 
+          onClick={() => removeFriend(friendship.id)}
+          variant="destructive"
+          size="sm"
+        >
+          <UserMinus className="w-4 h-4 mr-2" />
+          Remove Friend
+        </Button>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -233,7 +275,7 @@ const Friends = () => {
       <div className="container mx-auto p-4 max-w-4xl">
         <div className="space-y-6">
           <Card className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Follow by Email</h2>
+            <h2 className="text-xl font-semibold mb-4">Find Friends by Email</h2>
             <div className="flex gap-2">
               <Input
                 type="email"
@@ -243,16 +285,31 @@ const Friends = () => {
                 className="flex-1"
               />
               <Button 
-                onClick={() => followUserByEmail(searchEmail)}
+                onClick={() => {
+                  const user = users.find(u => u.email === searchEmail);
+                  if (user) {
+                    sendFriendRequest(user.id);
+                    setSearchEmail("");
+                  } else {
+                    toast({
+                      title: "User not found",
+                      description: "No user found with that email address",
+                      variant: "destructive",
+                    });
+                  }
+                }}
                 disabled={isLoading || !searchEmail}
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Following...
+                    Sending...
                   </>
                 ) : (
-                  "Follow"
+                  <>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Add Friend
+                  </>
                 )}
               </Button>
             </div>
@@ -266,17 +323,7 @@ const Friends = () => {
                     <h3 className="font-semibold">{user.username || 'Anonymous'}</h3>
                     <p className="text-sm text-gray-500">{user.email}</p>
                   </div>
-                  <Button
-                    variant={isFollowing(user.id) ? "destructive" : "default"}
-                    onClick={() =>
-                      isFollowing(user.id)
-                        ? unfollowUser(user.id)
-                        : followUserByEmail(user.email)
-                    }
-                    className="ml-2"
-                  >
-                    {isFollowing(user.id) ? "Unfollow" : "Follow"}
-                  </Button>
+                  {renderFriendshipButton(user.id)}
                 </div>
               </Card>
             ))}

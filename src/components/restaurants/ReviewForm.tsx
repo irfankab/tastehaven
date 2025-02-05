@@ -129,21 +129,14 @@ export const ReviewForm = ({
         .select()
         .single();
 
-      if (insertError) {
-        toast({
-          title: "Error",
-          description: "Failed to submit review. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
+      if (insertError) throw insertError;
 
       const reviewToReturn = {
         id: reviewData.id,
         userName: profile?.username || user.email?.split('@')[0] || 'Anonymous',
         rating: reviewData.rating,
         comment: reviewData.comment,
-        date: reviewData.created_at,
+        date: new Date().toLocaleDateString(),
         image_url: reviewData.image_url,
         likes: 0
       };
@@ -154,7 +147,7 @@ export const ReviewForm = ({
         description: "Your review has been submitted",
       });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting review:', error);
       toast({
         title: "Error",
