@@ -19,6 +19,7 @@ interface Friendship {
   user_id: string;
   friend_id: string;
   status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
 }
 
 const Friends = () => {
@@ -86,7 +87,13 @@ const Friends = () => {
         return;
       }
 
-      setFriendships(data || []);
+      // Type assertion to ensure the status is one of the allowed values
+      const typedFriendships = (data || []).map(friendship => ({
+        ...friendship,
+        status: friendship.status as 'pending' | 'accepted' | 'rejected'
+      }));
+
+      setFriendships(typedFriendships);
     };
 
     if (currentUserId) {
