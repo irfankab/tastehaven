@@ -1,155 +1,77 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Camera } from "lucide-react";
+import { Avatar } from "@/components/ui/avatar";
+import { Grid, User, MapPin, Calendar, Mail } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
   id: string;
-  username: string | null;
-  avatar_url: string | null;
-  full_name: string | null;
-  bio: string | null;
-  location: string | null;
+  username: string;
+  full_name: string;
+  avatar_url: string;
+  bio: string;
+  location: string;
+  email: string;
+  date_of_birth: string;
 }
 
 const Profile = () => {
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
+  const { id } = useParams();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "",
-    full_name: "",
-    bio: "",
-    location: "",
-  });
-  
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    getProfile();
-  }, []);
+    const fetchProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        const { data: profileData, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", id || user?.id)
+          .single();
 
-  const getProfile = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        navigate("/auth");
-        return;
+        if (error) throw error;
+
+        setProfile(profileData);
+        setIsCurrentUser(user?.id === (id || user?.id));
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load profile",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+    fetchProfile();
+  }, [id]);
 
-      if (error) throw error;
-
-      setProfile(data);
-      setFormData({
-        username: data.username || "",
-        full_name: data.full_name || "",
-        bio: data.bio || "",
-        location: data.location || "",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error fetching profile",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      setUploading(true);
-      
-      if (!event.target.files || event.target.files.length === 0) {
-        throw new Error("You must select an image to upload.");
-      }
-
-      const file = event.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const filePath = `${profile?.id}/${Math.random()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("profile-pictures")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: filePath })
-        .eq("id", profile?.id);
-
-      if (updateError) throw updateError;
-
-      toast({
-        title: "Success",
-        description: "Profile picture updated successfully!",
-      });
-      
-      getProfile();
-    } catch (error: any) {
-      toast({
-        title: "Error uploading avatar",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const updateProfile = async () => {
-    try {
-      setLoading(true);
-      
-      const { error } = await supabase
-        .from("profiles")
-        .update(formData)
-        .eq("id", profile?.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Profile updated successfully!",
-      });
-      
-      setEditing(false);
-      getProfile();
-    } catch (error: any) {
-      toast({
-        title: "Error updating profile",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <div className="flex items-center justify-center h-[calc(100vh-64px)]">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <p className="text-center text-gray-500">Profile not found</p>
         </div>
       </div>
     );
@@ -158,103 +80,85 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="container mx-auto p-4 max-w-2xl">
-        <Card className="p-6">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="relative">
-              <Avatar className="h-32 w-32">
-                {profile?.avatar_url ? (
-                  <AvatarImage
-                    src={`${supabase.storage.from("profile-pictures").getPublicUrl(profile.avatar_url).data.publicUrl}`}
-                    alt={profile.username || "Profile picture"}
-                  />
-                ) : (
-                  <AvatarFallback>
-                    {profile?.username?.charAt(0).toUpperCase() || "U"}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <label
-                htmlFor="avatar-upload"
-                className="absolute bottom-0 right-0 p-2 bg-primary text-white rounded-full cursor-pointer hover:bg-primary/90 transition-colors"
-              >
-                {uploading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Camera className="h-4 w-4" />
-                )}
-              </label>
-              <input
-                type="file"
-                id="avatar-upload"
-                accept="image/*"
-                onChange={uploadAvatar}
-                className="hidden"
-                disabled={uploading}
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+            <Avatar className="w-32 h-32">
+              <img
+                src={profile.avatar_url || "/placeholder.svg"}
+                alt={profile.username}
+                className="w-full h-full object-cover rounded-full"
               />
-            </div>
-
-            {editing ? (
-              <div className="w-full space-y-4">
-                <Input
-                  placeholder="Username"
-                  value={formData.username}
-                  onChange={(e) =>
-                    setFormData({ ...formData, username: e.target.value })
-                  }
-                />
-                <Input
-                  placeholder="Full Name"
-                  value={formData.full_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, full_name: e.target.value })
-                  }
-                />
-                <Textarea
-                  placeholder="Bio"
-                  value={formData.bio}
-                  onChange={(e) =>
-                    setFormData({ ...formData, bio: e.target.value })
-                  }
-                />
-                <Input
-                  placeholder="Location"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                />
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setEditing(false)}
-                    disabled={loading}
-                  >
-                    Cancel
-                  </Button>
-                  <Button onClick={updateProfile} disabled={loading}>
-                    {loading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Save"
-                    )}
-                  </Button>
+            </Avatar>
+            
+            <div className="flex-1">
+              <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold mb-2 md:mb-0">{profile.username}</h1>
+                {isCurrentUser && (
+                  <Button variant="outline">Edit Profile</Button>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center md:text-left mb-6">
+                <div>
+                  <span className="font-semibold">0</span> posts
+                </div>
+                <div>
+                  <span className="font-semibold">0</span> followers
+                </div>
+                <div>
+                  <span className="font-semibold">0</span> following
                 </div>
               </div>
-            ) : (
-              <div className="w-full space-y-4 text-center">
-                <h2 className="text-2xl font-bold">
-                  {profile?.username || "Username"}
-                </h2>
-                <p className="text-gray-600">{profile?.full_name}</p>
-                <p className="text-gray-600">{profile?.bio}</p>
-                <p className="text-gray-600">{profile?.location}</p>
-                <Button onClick={() => setEditing(true)}>Edit Profile</Button>
+              
+              <div className="space-y-2">
+                {profile.full_name && (
+                  <p className="font-semibold">{profile.full_name}</p>
+                )}
+                {profile.bio && (
+                  <p className="text-gray-600">{profile.bio}</p>
+                )}
+                <div className="flex flex-col gap-2 text-gray-600">
+                  {profile.location && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>{profile.location}</span>
+                    </div>
+                  )}
+                  {profile.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      <span>{profile.email}</span>
+                    </div>
+                  )}
+                  {profile.date_of_birth && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      <span>{new Date(profile.date_of_birth).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
           </div>
-        </Card>
-      </div>
+
+          <div className="mt-8 border-t pt-8">
+            <div className="flex justify-center mb-8">
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Grid className="w-4 h-4" />
+                <span>Posts</span>
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4">
+              {/* Posts will be added here */}
+              <div className="aspect-square bg-gray-100 rounded-md flex items-center justify-center">
+                <User className="w-8 h-8 text-gray-400" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { ReviewForm } from "@/components/restaurants/ReviewForm";
@@ -30,6 +30,7 @@ interface Restaurant {
 
 const RestaurantDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [session, setSession] = useState(null);
@@ -39,6 +40,11 @@ const RestaurantDetails = () => {
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
+        if (!id || id === "1") {
+          navigate("/explore");
+          return;
+        }
+
         const { data: restaurantData, error: restaurantError } = await supabase
           .from("restaurants")
           .select("*")
@@ -68,7 +74,7 @@ const RestaurantDetails = () => {
           comment: review.comment,
           date: new Date(review.created_at).toLocaleDateString(),
           image_url: review.image_url,
-          likes: 0 // You can implement a likes system later
+          likes: 0
         }));
 
         setRestaurant({
@@ -85,18 +91,18 @@ const RestaurantDetails = () => {
           description: "Failed to load restaurant details",
           variant: "destructive",
         });
+        navigate("/explore");
       } finally {
         setIsLoading(false);
       }
     };
 
-    // Check authentication status
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
     fetchRestaurant();
-  }, [id]);
+  }, [id, navigate]);
 
   const handleReviewSubmitted = (newReview: Review) => {
     setRestaurant(prev => {
@@ -116,7 +122,7 @@ const RestaurantDetails = () => {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <div className="pt-20 flex justify-center items-center min-h-screen">
+        <div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
         </div>
       </div>
@@ -127,7 +133,7 @@ const RestaurantDetails = () => {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <div className="pt-20 container mx-auto px-4">
+        <div className="container mx-auto px-4 py-8">
           <p className="text-center text-gray-500">Restaurant not found</p>
         </div>
       </div>
@@ -137,11 +143,11 @@ const RestaurantDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="pt-20 container mx-auto px-4">
+      <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src={restaurant.image_url}
+              src={restaurant.image_url || "/placeholder.svg"}
               alt={restaurant.name}
               className="w-full h-64 object-cover"
             />
@@ -162,13 +168,15 @@ const RestaurantDetails = () => {
                 </div>
               </div>
 
-              {session && (
+              {session ? (
                 <Button
                   onClick={() => setIsReviewModalOpen(true)}
                   className="w-full sm:w-auto mb-6"
                 >
                   Write a Review
                 </Button>
+              ) : (
+                <p className="text-gray-500 mb-6">Sign in to write a review</p>
               )}
 
               <div className="mt-8">

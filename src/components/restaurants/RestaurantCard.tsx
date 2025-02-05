@@ -37,10 +37,10 @@ export const RestaurantCard = ({
 }: RestaurantCardProps) => {
   return (
     <Link to={`/restaurant/${id}`} className="block">
-      <Card className="overflow-hidden transition-all hover:shadow-lg">
+      <Card className="overflow-hidden transition-all hover:shadow-lg hover:scale-[1.02]">
         <div className="relative h-48">
           <img
-            src={imageUrl}
+            src={imageUrl || "/placeholder.svg"}
             alt={name}
             className="w-full h-full object-cover"
           />
@@ -55,11 +55,11 @@ export const RestaurantCard = ({
             <h3 className="text-lg font-semibold">{name}</h3>
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium">{rating}</span>
+              <span className="text-sm font-medium">{rating.toFixed(1)}</span>
             </div>
           </div>
           <Badge className="mb-2">{cuisine}</Badge>
-          <p className="text-sm text-gray-600 mb-4">{address}</p>
+          <p className="text-sm text-gray-600 mb-4 truncate">{address}</p>
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center gap-1">
               <ThumbsUp className="w-4 h-4" />
