@@ -1,12 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Header } from "@/components/layout/Header";
 import { Loader2, Send } from "lucide-react";
+import { ContactList } from "@/components/messages/ContactList";
+import { MessageList } from "@/components/messages/MessageList";
 
 interface Message {
   id: string;
@@ -33,21 +34,19 @@ const Messages = () => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to view messages",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const { data: profiles, error } = await supabase
         .from("profiles")
@@ -76,81 +75,61 @@ const Messages = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const channels = [
-        // Listen for messages sent to the selected user
-        supabase
-          .channel('messages_sent')
-          .on(
-            'postgres_changes',
-            {
-              event: 'INSERT',
-              schema: 'public',
-              table: 'messages',
-              filter: `sender_id=eq.${user.id}`,
-            },
-            (payload) => {
-              console.log('Sent message:', payload);
-              fetchMessages();
-            }
-          )
-          .subscribe(),
-
-        // Listen for messages received from the selected user
-        supabase
-          .channel('messages_received')
-          .on(
-            'postgres_changes',
-            {
-              event: 'INSERT',
-              schema: 'public',
-              table: 'messages',
-              filter: `receiver_id=eq.${user.id}`,
-            },
-            (payload) => {
-              console.log('Received message:', payload);
-              fetchMessages();
-            }
-          )
-          .subscribe()
-      ];
+      // Create a single channel for both sent and received messages
+      const channel = supabase
+        .channel('messages')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+            filter: `or(sender_id.eq.${user.id},receiver_id.eq.${user.id})`,
+          },
+          () => {
+            fetchMessages();
+          }
+        )
+        .subscribe();
 
       return () => {
-        channels.forEach(channel => supabase.removeChannel(channel));
+        supabase.removeChannel(channel);
       };
     };
 
     const fetchMessages = async () => {
       setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-      const { data, error } = await supabase
-        .from("messages")
-        .select(`
-          id,
-          content,
-          sender_id,
-          receiver_id,
-          created_at,
-          sender:profiles!messages_sender_id_fkey (
-            username,
-            avatar_url
-          )
-        `)
-        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${user.id})`)
-        .order("created_at", { ascending: true });
+        const { data, error } = await supabase
+          .from("messages")
+          .select(`
+            id,
+            content,
+            sender_id,
+            receiver_id,
+            created_at,
+            sender:profiles!messages_sender_id_fkey (
+              username,
+              avatar_url
+            )
+          `)
+          .or(`and(sender_id.eq.${user.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${user.id})`)
+          .order("created_at", { ascending: true });
 
-      if (error) {
+        if (error) throw error;
+        setMessages(data as Message[] || []);
+      } catch (error: any) {
         toast({
           title: "Error fetching messages",
           description: error.message,
           variant: "destructive",
         });
-        return;
+      } finally {
+        setIsLoading(false);
       }
-
-      setMessages(data as Message[] || []);
-      setIsLoading(false);
     };
 
     fetchMessages();
@@ -164,28 +143,28 @@ const Messages = () => {
   const sendMessage = async () => {
     if (!newMessage.trim() || !selectedUser) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
     setIsLoading(true);
-    const { error } = await supabase.from("messages").insert({
-      content: newMessage,
-      sender_id: user.id,
-      receiver_id: selectedUser,
-    });
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Authentication required");
 
-    if (error) {
+      const { error } = await supabase.from("messages").insert({
+        content: newMessage,
+        sender_id: user.id,
+        receiver_id: selectedUser,
+      });
+
+      if (error) throw error;
+      setNewMessage("");
+    } catch (error: any) {
       toast({
         title: "Error sending message",
         description: error.message,
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    setNewMessage("");
-    setIsLoading(false);
   };
 
   return (
@@ -193,78 +172,18 @@ const Messages = () => {
       <Header />
       <div className="container mx-auto p-4 max-w-4xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="md:col-span-1 p-4">
-            <h2 className="font-semibold mb-4">Contacts</h2>
-            <ScrollArea className="h-[500px]">
-              <div className="space-y-2">
-                {users.map((user) => (
-                  <button
-                    key={user.id}
-                    onClick={() => setSelectedUser(user.id)}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${
-                      selectedUser === user.id 
-                        ? "bg-gray-100 hover:bg-gray-200" 
-                        : "hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      {user.avatar_url ? (
-                        <img 
-                          src={user.avatar_url} 
-                          alt={user.username || 'User'} 
-                          className="w-8 h-8 rounded-full"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                          {(user.username || 'A')[0].toUpperCase()}
-                        </div>
-                      )}
-                      <div>
-                        <p className="font-medium">{user.username || 'Anonymous'}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </ScrollArea>
-          </Card>
+          <ContactList 
+            users={users}
+            selectedUser={selectedUser}
+            onSelectUser={setSelectedUser}
+          />
           
           <Card className="md:col-span-3 p-4">
-            <ScrollArea className="h-[500px] mb-4 relative">
-              {isLoading ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                  <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${
-                        message.sender_id === selectedUser
-                          ? "justify-start"
-                          : "justify-end"
-                      }`}
-                    >
-                      <div
-                        className={`rounded-lg p-3 max-w-[70%] ${
-                          message.sender_id === selectedUser
-                            ? "bg-gray-100"
-                            : "bg-blue-500 text-white"
-                        }`}
-                      >
-                        <p className="break-words">{message.content}</p>
-                        <span className="text-xs opacity-70 mt-1 block">
-                          {new Date(message.created_at).toLocaleTimeString()}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-              )}
-            </ScrollArea>
+            <MessageList 
+              messages={messages}
+              selectedUser={selectedUser}
+              isLoading={isLoading}
+            />
             
             <div className="flex gap-2">
               <Input
