@@ -3,9 +3,11 @@ import { useParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
-import { Grid, User, MapPin, Calendar, Mail } from "lucide-react";
+import { Grid, User, MapPin, Calendar, Mail, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { CreatePostModal } from "@/components/profile/CreatePostModal";
+import { PostsGrid } from "@/components/profile/PostsGrid";
 
 interface Profile {
   id: string;
@@ -18,12 +20,41 @@ interface Profile {
   date_of_birth: string;
 }
 
+interface Post {
+  id: string;
+  media_url: string;
+  media_type: string;
+  caption: string;
+}
+
 const Profile = () => {
   const { id } = useParams();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const { toast } = useToast();
+
+  const fetchPosts = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPosts(data || []);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load posts",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -40,6 +71,10 @@ const Profile = () => {
 
         setProfile(profileData);
         setIsCurrentUser(user?.id === (id || user?.id));
+        
+        if (profileData) {
+          fetchPosts(profileData.id);
+        }
       } catch (error) {
         console.error("Error fetching profile:", error);
         toast({
@@ -81,84 +116,102 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-            <Avatar className="w-32 h-32">
-              <img
-                src={profile.avatar_url || "/placeholder.svg"}
-                alt={profile.username}
-                className="w-full h-full object-cover rounded-full"
-              />
-            </Avatar>
-            
-            <div className="flex-1">
-              <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold mb-2 md:mb-0">{profile.username}</h1>
-                {isCurrentUser && (
-                  <Button variant="outline">Edit Profile</Button>
-                )}
-              </div>
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+              <Avatar className="w-32 h-32">
+                <img
+                  src={profile.avatar_url || "/placeholder.svg"}
+                  alt={profile.username}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </Avatar>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center md:text-left mb-6">
-                <div>
-                  <span className="font-semibold">0</span> posts
-                </div>
-                <div>
-                  <span className="font-semibold">0</span> followers
-                </div>
-                <div>
-                  <span className="font-semibold">0</span> following
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                {profile.full_name && (
-                  <p className="font-semibold">{profile.full_name}</p>
-                )}
-                {profile.bio && (
-                  <p className="text-gray-600">{profile.bio}</p>
-                )}
-                <div className="flex flex-col gap-2 text-gray-600">
-                  {profile.location && (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      <span>{profile.location}</span>
+              <div className="flex-1">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+                  <h1 className="text-2xl font-bold mb-2 md:mb-0">{profile.username}</h1>
+                  {isCurrentUser && (
+                    <div className="flex gap-2">
+                      <Button variant="outline">Edit Profile</Button>
+                      <Button onClick={() => setIsCreatePostModalOpen(true)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Post
+                      </Button>
                     </div>
                   )}
-                  {profile.email && (
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4" />
-                      <span>{profile.email}</span>
-                    </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4 text-center md:text-left mb-6">
+                  <div>
+                    <span className="font-semibold">{posts.length}</span> posts
+                  </div>
+                  <div>
+                    <span className="font-semibold">0</span> followers
+                  </div>
+                  <div>
+                    <span className="font-semibold">0</span> following
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  {profile.full_name && (
+                    <p className="font-semibold">{profile.full_name}</p>
                   )}
-                  {profile.date_of_birth && (
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>{new Date(profile.date_of_birth).toLocaleDateString()}</span>
-                    </div>
+                  {profile.bio && (
+                    <p className="text-gray-600">{profile.bio}</p>
                   )}
+                  <div className="flex flex-col gap-2 text-gray-600">
+                    {profile.location && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        <span>{profile.location}</span>
+                      </div>
+                    )}
+                    {profile.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        <span>{profile.email}</span>
+                      </div>
+                    )}
+                    {profile.date_of_birth && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        <span>{new Date(profile.date_of_birth).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 border-t pt-8">
-            <div className="flex justify-center mb-8">
-              <Button variant="ghost" className="flex items-center gap-2">
-                <Grid className="w-4 h-4" />
-                <span>Posts</span>
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              {/* Posts will be added here */}
-              <div className="aspect-square bg-gray-100 rounded-md flex items-center justify-center">
-                <User className="w-8 h-8 text-gray-400" />
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="border-b mb-6">
+              <div className="flex justify-center">
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <Grid className="w-4 h-4" />
+                  <span>Posts</span>
+                </Button>
               </div>
             </div>
+            
+            {posts.length > 0 ? (
+              <PostsGrid posts={posts} />
+            ) : (
+              <div className="text-center py-8">
+                <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No posts yet</p>
+              </div>
+            )}
           </div>
         </div>
       </main>
+
+      <CreatePostModal
+        isOpen={isCreatePostModalOpen}
+        onClose={() => setIsCreatePostModalOpen(false)}
+        onPostCreated={() => fetchPosts(profile.id)}
+      />
     </div>
   );
 };
