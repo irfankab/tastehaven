@@ -36,7 +36,7 @@ export const RestaurantCard = ({
   reviews,
 }: RestaurantCardProps) => {
   return (
-    <Link to={`/restaurant/${id}`}>
+    <Link to={`/restaurant/${id}`} className="block">
       <Card className="overflow-hidden transition-all hover:shadow-lg">
         <div className="relative h-48">
           <img

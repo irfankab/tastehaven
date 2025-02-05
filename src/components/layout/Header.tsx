@@ -11,10 +11,12 @@ export const Header = ({ onSearch }: { onSearch?: (query: string) => void }) => 
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
+    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -23,6 +25,11 @@ export const Header = ({ onSearch }: { onSearch?: (query: string) => void }) => 
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -49,6 +56,12 @@ export const Header = ({ onSearch }: { onSearch?: (query: string) => void }) => 
             {session ? (
               <>
                 <Link
+                  to="/profile"
+                  className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-full transition-colors"
+                >
+                  Profile
+                </Link>
+                <Link
                   to="/messages"
                   className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-full transition-colors"
                 >
@@ -61,7 +74,7 @@ export const Header = ({ onSearch }: { onSearch?: (query: string) => void }) => 
                   Friends
                 </Link>
                 <button
-                  onClick={() => supabase.auth.signOut()}
+                  onClick={handleSignOut}
                   className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-full transition-colors"
                 >
                   Sign Out
@@ -110,6 +123,13 @@ export const Header = ({ onSearch }: { onSearch?: (query: string) => void }) => 
               {session ? (
                 <>
                   <Link
+                    to="/profile"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
                     to="/messages"
                     className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                     onClick={() => setIsMenuOpen(false)}
@@ -125,7 +145,7 @@ export const Header = ({ onSearch }: { onSearch?: (query: string) => void }) => 
                   </Link>
                   <button
                     onClick={() => {
-                      supabase.auth.signOut();
+                      handleSignOut();
                       setIsMenuOpen(false);
                     }}
                     className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
