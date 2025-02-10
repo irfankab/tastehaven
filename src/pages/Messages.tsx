@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -71,32 +72,6 @@ const Messages = () => {
   useEffect(() => {
     if (!selectedUser) return;
 
-    const setupRealtimeSubscriptions = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Create a single channel for both sent and received messages
-      const channel = supabase
-        .channel('messages')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'messages',
-            filter: `or(sender_id.eq.${user.id},receiver_id.eq.${user.id})`,
-          },
-          () => {
-            fetchMessages();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    };
-
     const fetchMessages = async () => {
       setIsLoading(true);
       try {
@@ -132,11 +107,32 @@ const Messages = () => {
       }
     };
 
+    // Set up realtime subscription
+    const channel = supabase
+      .channel('messages')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+          filter: `or(sender_id.eq.${selectedUser},receiver_id.eq.${selectedUser})`
+        },
+        (payload) => {
+          console.log('Received realtime update:', payload);
+          fetchMessages(); // Refresh messages when we receive an update
+        }
+      )
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
+
+    // Initial fetch
     fetchMessages();
-    const cleanup = setupRealtimeSubscriptions();
-    
+
+    // Cleanup subscription
     return () => {
-      cleanup.then(cleanupFn => cleanupFn && cleanupFn());
+      channel.unsubscribe();
     };
   }, [selectedUser, toast]);
 
