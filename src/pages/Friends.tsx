@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"; 
 import { Header } from "@/components/layout/Header";
 import { Loader2, UserPlus, UserMinus, Check, X } from "lucide-react";
+import { ErrorBoundary } from "react-error-boundary";
 
 interface Profile {
   id: string;
@@ -84,10 +85,10 @@ const Friends = () => {
 
         if (error) throw error;
 
-        const typedFriendships = (data || []).map(friendship => ({
+        const typedFriendships = data?.map(friendship => ({
           ...friendship,
-          status: friendship.status as 'pending' | 'accepted' | 'rejected'
-        }));
+          status: friendship.status as Friendship['status']
+        })) || [];
 
         setFriendships(typedFriendships);
       } catch (error: any) {
@@ -290,7 +291,9 @@ const Friends = () => {
 
   if (isInitialLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min
+
+-h-screen bg-gray-50">
         <Header />
         <div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -300,72 +303,74 @@ const Friends = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <div className="container mx-auto p-4 max-w-4xl">
-        <div className="space-y-6">
-          <Card className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Find Friends by Email</h2>
-            <div className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="Enter email address"
-                value={searchEmail}
-                onChange={(e) => setSearchEmail(e.target.value)}
-                className="flex-1"
-              />
-              <Button 
-                onClick={() => {
-                  const user = users.find(u => u.email === searchEmail);
-                  if (user) {
-                    sendFriendRequest(user.id);
-                    setSearchEmail("");
-                  } else {
-                    toast({
-                      title: "User not found",
-                      description: "No user found with that email address",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                disabled={isLoading || !searchEmail}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Add Friend
-                  </>
-                )}
-              </Button>
-            </div>
-          </Card>
+    <ErrorBoundary fallback={<div>Something went wrong. Please try again.</div>}>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto p-4 max-w-4xl">
+          <div className="space-y-6">
+            <Card className="p-4">
+              <h2 className="text-xl font-semibold mb-4">Find Friends by Email</h2>
+              <div className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Enter email address"
+                  value={searchEmail}
+                  onChange={(e) => setSearchEmail(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={() => {
+                    const user = users.find(u => u.email === searchEmail);
+                    if (user) {
+                      sendFriendRequest(user.id);
+                      setSearchEmail("");
+                    } else {
+                      toast({
+                        title: "User not found",
+                        description: "No user found with that email address",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  disabled={isLoading || !searchEmail}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Add Friend
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {users.map((user) => (
-              <Card key={user.id} className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h3 className="font-semibold">{user.username || 'Anonymous'}</h3>
-                    <p className="text-sm text-gray-500">{user.email}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {users.map((user) => (
+                <Card key={user.id} className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <h3 className="font-semibold">{user.username || 'Anonymous'}</h3>
+                      <p className="text-sm text-gray-500">{user.email}</p>
+                    </div>
+                    {renderFriendshipButton(user.id)}
                   </div>
-                  {renderFriendshipButton(user.id)}
-                </div>
-              </Card>
-            ))}
-            {users.length === 0 && (
-              <p className="text-gray-500 col-span-full text-center py-8">
-                No users found
-              </p>
-            )}
+                </Card>
+              ))}
+              {users.length === 0 && (
+                <p className="text-gray-500 col-span-full text-center py-8">
+                  No users found
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 
