@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -28,21 +29,23 @@ const Friends = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [searchEmail, setSearchEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error) {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) throw error;
+        if (user) {
+          setCurrentUserId(user.id);
+        }
+      } catch (error: any) {
         toast({
           title: "Error fetching current user",
           description: error.message,
           variant: "destructive",
         });
-        return;
-      }
-      if (user) {
-        setCurrentUserId(user.id);
       }
     };
 
@@ -53,47 +56,49 @@ const Friends = () => {
     const fetchUsers = async () => {
       if (!currentUserId) return;
 
-      const { data: profiles, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .neq("id", currentUserId);
+      try {
+        const { data: profiles, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .neq("id", currentUserId);
 
-      if (error) {
+        if (error) throw error;
+        setUsers(profiles || []);
+      } catch (error: any) {
         toast({
           title: "Error fetching users",
           description: error.message,
           variant: "destructive",
         });
-        return;
       }
-
-      setUsers(profiles || []);
     };
 
     const fetchFriendships = async () => {
       if (!currentUserId) return;
 
-      const { data, error } = await supabase
-        .from("friendships")
-        .select("*")
-        .or(`user_id.eq.${currentUserId},friend_id.eq.${currentUserId}`);
+      try {
+        const { data, error } = await supabase
+          .from("friendships")
+          .select("*")
+          .or(`user_id.eq.${currentUserId},friend_id.eq.${currentUserId}`);
 
-      if (error) {
+        if (error) throw error;
+
+        const typedFriendships = (data || []).map(friendship => ({
+          ...friendship,
+          status: friendship.status as 'pending' | 'accepted' | 'rejected'
+        }));
+
+        setFriendships(typedFriendships);
+      } catch (error: any) {
         toast({
           title: "Error fetching friendships",
           description: error.message,
           variant: "destructive",
         });
-        return;
+      } finally {
+        setIsInitialLoading(false);
       }
-
-      // Type assertion to ensure the status is one of the allowed values
-      const typedFriendships = (data || []).map(friendship => ({
-        ...friendship,
-        status: friendship.status as 'pending' | 'accepted' | 'rejected'
-      }));
-
-      setFriendships(typedFriendships);
     };
 
     if (currentUserId) {
@@ -122,7 +127,14 @@ const Friends = () => {
   }, [currentUserId, toast]);
 
   const sendFriendRequest = async (userId: string) => {
-    if (!currentUserId) return;
+    if (!currentUserId) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to send friend requests",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -276,6 +288,17 @@ const Friends = () => {
     return null;
   };
 
+  if (isInitialLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -334,6 +357,11 @@ const Friends = () => {
                 </div>
               </Card>
             ))}
+            {users.length === 0 && (
+              <p className="text-gray-500 col-span-full text-center py-8">
+                No users found
+              </p>
+            )}
           </div>
         </div>
       </div>

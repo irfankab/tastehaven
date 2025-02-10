@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,6 +50,8 @@ export const ReviewForm = ({
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      
+      // Validate file size
       if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "Error",
@@ -57,6 +60,17 @@ export const ReviewForm = ({
         });
         return;
       }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Error",
+          description: "Please select an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setSelectedImage(file);
       
       const reader = new FileReader();
@@ -87,6 +101,8 @@ export const ReviewForm = ({
       }
 
       let imageUrl = null;
+      let uploadedFilePath = null;
+
       if (selectedImage) {
         const fileExt = selectedImage.name.split('.').pop();
         const filePath = `${crypto.randomUUID()}.${fileExt}`;
@@ -103,6 +119,8 @@ export const ReviewForm = ({
           });
           return;
         }
+
+        uploadedFilePath = filePath;
 
         const { data: { publicUrl } } = supabase.storage
           .from('restaurant-images')
@@ -129,7 +147,15 @@ export const ReviewForm = ({
         .select()
         .single();
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        // If review insertion fails, delete the uploaded image
+        if (uploadedFilePath) {
+          await supabase.storage
+            .from('restaurant-images')
+            .remove([uploadedFilePath]);
+        }
+        throw insertError;
+      }
 
       const reviewToReturn = {
         id: reviewData.id,
@@ -164,7 +190,7 @@ export const ReviewForm = ({
       <div className="flex items-center space-x-2">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
-            key={star}
+            key={`star-${star}`}
             className={`w-8 h-8 cursor-pointer transition-all duration-200 ${
               star <= (hoveredStar || rating)
                 ? "fill-yellow-400 text-yellow-400"
@@ -173,6 +199,9 @@ export const ReviewForm = ({
             onMouseEnter={() => setHoveredStar(star)}
             onMouseLeave={() => setHoveredStar(0)}
             onClick={() => setRating(star)}
+            data-rating={star}
+            role="button"
+            aria-label={`Rate ${star} stars`}
           />
         ))}
       </div>
@@ -182,6 +211,8 @@ export const ReviewForm = ({
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         className="min-h-[100px]"
+        maxLength={1000}
+        aria-label="Review comment"
       />
 
       <div className="flex items-center gap-4">
@@ -191,6 +222,7 @@ export const ReviewForm = ({
           id="image-upload"
           className="hidden"
           onChange={handleImageSelect}
+          aria-label="Upload image"
         />
         <label
           htmlFor="image-upload"
@@ -215,6 +247,7 @@ export const ReviewForm = ({
               setSelectedImage(null);
               setImagePreview(null);
             }}
+            aria-label="Remove image"
           >
             ×
           </button>

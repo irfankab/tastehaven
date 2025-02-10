@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { ReviewForm } from "@/components/restaurants/ReviewForm";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Star, MapPin, ThumbsUp } from "lucide-react";
+import { Star, MapPin, ThumbsUp, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -35,12 +36,13 @@ const RestaurantDetails = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
-        if (!id || id === "1") {
+        if (!id) {
           navigate("/explore");
           return;
         }
@@ -49,9 +51,18 @@ const RestaurantDetails = () => {
           .from("restaurants")
           .select("*")
           .eq("id", id)
-          .single();
+          .maybeSingle();
 
         if (restaurantError) throw restaurantError;
+        if (!restaurantData) {
+          toast({
+            title: "Restaurant not found",
+            description: "The restaurant you're looking for doesn't exist",
+            variant: "destructive",
+          });
+          navigate("/explore");
+          return;
+        }
 
         const { data: reviewsData, error: reviewsError } = await supabase
           .from("reviews")
@@ -77,14 +88,16 @@ const RestaurantDetails = () => {
           likes: 0
         }));
 
+        const averageRating = formattedReviews.length > 0
+          ? formattedReviews.reduce((acc, review) => acc + review.rating, 0) / formattedReviews.length
+          : 0;
+
         setRestaurant({
           ...restaurantData,
           reviews: formattedReviews,
-          rating: formattedReviews.length > 0
-            ? formattedReviews.reduce((acc, review) => acc + review.rating, 0) / formattedReviews.length
-            : 0
+          rating: averageRating
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching restaurant:", error);
         toast({
           title: "Error",
@@ -102,13 +115,15 @@ const RestaurantDetails = () => {
     });
 
     fetchRestaurant();
-  }, [id, navigate]);
+  }, [id, navigate, toast]);
 
   const handleReviewSubmitted = (newReview: Review) => {
     setRestaurant(prev => {
       if (!prev) return prev;
       const updatedReviews = [...prev.reviews, newReview];
-      const newRating = updatedReviews.reduce((acc, review) => acc + review.rating, 0) / updatedReviews.length;
+      const newRating = updatedReviews.length > 0
+        ? updatedReviews.reduce((acc, review) => acc + review.rating, 0) / updatedReviews.length
+        : 0;
       return {
         ...prev,
         reviews: updatedReviews,
@@ -123,7 +138,7 @@ const RestaurantDetails = () => {
       <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       </div>
     );
@@ -146,11 +161,23 @@ const RestaurantDetails = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={restaurant.image_url || "/placeholder.svg"}
-              alt={restaurant.name}
-              className="w-full h-64 object-cover"
-            />
+            <div className="relative">
+              {imageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              )}
+              <img
+                src={restaurant.image_url || "/placeholder.svg"}
+                alt={restaurant.name}
+                className={`w-full h-64 object-cover ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+                onLoad={() => setImageLoading(false)}
+                onError={(e) => {
+                  e.currentTarget.src = "/placeholder.svg";
+                  setImageLoading(false);
+                }}
+              />
+            </div>
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -203,6 +230,9 @@ const RestaurantDetails = () => {
                             src={review.image_url}
                             alt="Review"
                             className="rounded-lg max-h-48 object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         )}
                         <div className="flex items-center gap-2 mt-4 text-gray-500">
