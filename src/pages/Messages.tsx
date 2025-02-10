@@ -107,32 +107,49 @@ const Messages = () => {
       }
     };
 
-    // Set up realtime subscription
-    const channel = supabase
-      .channel('messages')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `or(sender_id.eq.${selectedUser},receiver_id.eq.${selectedUser})`
-        },
-        (payload) => {
-          console.log('Received realtime update:', payload);
-          fetchMessages(); // Refresh messages when we receive an update
-        }
-      )
-      .subscribe((status) => {
-        console.log('Subscription status:', status);
-      });
+    const setupRealtimeSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      console.log('Setting up realtime subscription for currentUser:', user.id, 'selectedUser:', selectedUser);
+
+      const channel = supabase
+        .channel('messages')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+            filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${user.id}))`,
+          },
+          (payload) => {
+            console.log('Received realtime update:', payload);
+            fetchMessages(); // Refresh messages when we receive an update
+          }
+        )
+        .subscribe((status) => {
+          console.log('Subscription status:', status);
+        });
+
+      return channel;
+    };
 
     // Initial fetch
     fetchMessages();
 
+    // Setup subscription
+    let channel: ReturnType<typeof supabase.channel>;
+    setupRealtimeSubscription().then(ch => {
+      channel = ch;
+    });
+
     // Cleanup subscription
     return () => {
-      channel.unsubscribe();
+      if (channel) {
+        console.log('Unsubscribing from channel');
+        channel.unsubscribe();
+      }
     };
   }, [selectedUser, toast]);
 
