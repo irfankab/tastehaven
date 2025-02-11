@@ -47,73 +47,88 @@ export const RestaurantCard = ({
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!id) return; // Guard against undefined id
     fetchReviews();
     fetchLikes();
     checkIfLiked();
   }, [id]);
 
   const fetchReviews = async () => {
-    const { data, error } = await supabase
-      .from('reviews')
-      .select(`
-        id,
-        rating,
-        comment,
-        created_at,
-        profiles (username)
-      `)
-      .eq('restaurant_id', id)
-      .order('created_at', { ascending: false })
-      .limit(2);
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+          id,
+          rating,
+          comment,
+          created_at,
+          profiles (username)
+        `)
+        .eq('restaurant_id', id)
+        .order('created_at', { ascending: false })
+        .limit(2);
 
-    if (error) {
-      console.error('Error fetching reviews:', error);
-      return;
+      if (error) {
+        console.error('Error fetching reviews:', error);
+        return;
+      }
+
+      if (!data) return;
+
+      const formattedReviews = data.map(review => ({
+        id: review.id,
+        userName: review.profiles?.username || 'Anonymous',
+        rating: review.rating,
+        comment: review.comment,
+        date: new Date(review.created_at).toLocaleDateString(),
+        likes: 0
+      }));
+
+      setReviews(formattedReviews);
+    } catch (error) {
+      console.error('Error in fetchReviews:', error);
     }
-
-    const formattedReviews = data.map(review => ({
-      id: review.id,
-      userName: review.profiles?.username || 'Anonymous',
-      rating: review.rating,
-      comment: review.comment,
-      date: new Date(review.created_at).toLocaleDateString(),
-      likes: 0
-    }));
-
-    setReviews(formattedReviews);
   };
 
   const fetchLikes = async () => {
-    const { count, error } = await supabase
-      .from('restaurant_likes')
-      .select('*', { count: 'exact', head: true })
-      .eq('restaurant_id', id);
+    try {
+      const { data, error } = await supabase
+        .from('restaurant_likes')
+        .select('*', { count: 'exact' })
+        .eq('restaurant_id', id);
 
-    if (error) {
-      console.error('Error fetching likes:', error);
-      return;
+      if (error) {
+        console.error('Error fetching likes:', error);
+        return;
+      }
+
+      setLikesCount(data?.length || 0);
+    } catch (error) {
+      console.error('Error in fetchLikes:', error);
     }
-
-    setLikesCount(count || 0);
   };
 
   const checkIfLiked = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
 
-    const { data, error } = await supabase
-      .from('restaurant_likes')
-      .select('id')
-      .eq('restaurant_id', id)
-      .eq('user_id', session.user.id)
-      .maybeSingle();
+      const { data, error } = await supabase
+        .from('restaurant_likes')
+        .select('id')
+        .eq('restaurant_id', id)
+        .eq('user_id', session.user.id)
+        .maybeSingle();
 
-    if (error) {
-      console.error('Error checking like status:', error);
-      return;
+      if (error) {
+        console.error('Error checking like status:', error);
+        return;
+      }
+
+      setIsLiked(!!data);
+    } catch (error) {
+      console.error('Error in checkIfLiked:', error);
     }
-
-    setIsLiked(!!data);
   };
 
   const handleLikeClick = async (e: React.MouseEvent) => {
@@ -131,19 +146,23 @@ export const RestaurantCard = ({
 
     try {
       if (isLiked) {
-        await supabase
+        const { error } = await supabase
           .from('restaurant_likes')
           .delete()
           .eq('restaurant_id', id)
           .eq('user_id', session.user.id);
+
+        if (error) throw error;
         setLikesCount(prev => prev - 1);
       } else {
-        await supabase
+        const { error } = await supabase
           .from('restaurant_likes')
           .insert({
             restaurant_id: id,
             user_id: session.user.id
           });
+
+        if (error) throw error;
         setLikesCount(prev => prev + 1);
       }
       setIsLiked(!isLiked);
