@@ -93,6 +93,26 @@ export const RestaurantCard = ({
             </div>
             <Badge className="mb-2">{cuisine}</Badge>
             <p className="text-sm text-gray-600 mb-4 truncate">{address}</p>
+            
+            {/* Reviews Section */}
+            <div className="mb-4">
+              <div className="text-sm font-medium text-gray-700 mb-2">Recent Reviews</div>
+              <div className="space-y-3 max-h-32 overflow-y-auto">
+                {reviews.slice(0, 2).map((review) => (
+                  <div key={review.id} className="text-sm border-b pb-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{review.userName}</span>
+                      <div className="flex items-center">
+                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400 mr-1" />
+                        <span>{review.rating}</span>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mt-1 line-clamp-2">{review.comment}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1 text-sm text-gray-500">
                 <ThumbsUp className="w-4 h-4" />
@@ -107,7 +127,7 @@ export const RestaurantCard = ({
                 onClick={handleReviewClick}
               >
                 <PenSquare className="w-4 h-4 mr-1" />
-                Review
+                Write a Review
               </Button>
             </div>
           </div>
