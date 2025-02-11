@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, ThumbsUp, PenSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ReviewForm } from "./ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,14 +39,126 @@ export const RestaurantCard = ({
   imageUrl,
   priceRange,
   address,
-  likes,
-  reviews,
 }: RestaurantCardProps) => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [likesCount, setLikesCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    fetchReviews();
+    fetchLikes();
+    checkIfLiked();
+  }, [id]);
+
+  const fetchReviews = async () => {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select(`
+        id,
+        rating,
+        comment,
+        created_at,
+        profiles (username)
+      `)
+      .eq('restaurant_id', id)
+      .order('created_at', { ascending: false })
+      .limit(2);
+
+    if (error) {
+      console.error('Error fetching reviews:', error);
+      return;
+    }
+
+    const formattedReviews = data.map(review => ({
+      id: review.id,
+      userName: review.profiles?.username || 'Anonymous',
+      rating: review.rating,
+      comment: review.comment,
+      date: new Date(review.created_at).toLocaleDateString(),
+      likes: 0
+    }));
+
+    setReviews(formattedReviews);
+  };
+
+  const fetchLikes = async () => {
+    const { count, error } = await supabase
+      .from('restaurant_likes')
+      .select('*', { count: 'exact', head: true })
+      .eq('restaurant_id', id);
+
+    if (error) {
+      console.error('Error fetching likes:', error);
+      return;
+    }
+
+    setLikesCount(count || 0);
+  };
+
+  const checkIfLiked = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data, error } = await supabase
+      .from('restaurant_likes')
+      .select('id')
+      .eq('restaurant_id', id)
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking like status:', error);
+      return;
+    }
+
+    setIsLiked(!!data);
+  };
+
+  const handleLikeClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to like restaurants",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (isLiked) {
+        await supabase
+          .from('restaurant_likes')
+          .delete()
+          .eq('restaurant_id', id)
+          .eq('user_id', session.user.id);
+        setLikesCount(prev => prev - 1);
+      } else {
+        await supabase
+          .from('restaurant_likes')
+          .insert({
+            restaurant_id: id,
+            user_id: session.user.id
+          });
+        setLikesCount(prev => prev + 1);
+      }
+      setIsLiked(!isLiked);
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update like status",
+        variant: "destructive",
+      });
+    }
+  };
   
   const handleReviewClick = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigation to restaurant details
+    e.preventDefault();
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       toast({
@@ -61,6 +173,7 @@ export const RestaurantCard = ({
 
   const handleReviewSubmitted = (newReview: Review) => {
     setIsReviewModalOpen(false);
+    fetchReviews(); // Refresh reviews after submission
     toast({
       title: "Review Submitted",
       description: "Thank you for your review!",
@@ -98,7 +211,7 @@ export const RestaurantCard = ({
             <div className="mb-4">
               <div className="text-sm font-medium text-gray-700 mb-2">Recent Reviews</div>
               <div className="space-y-3 max-h-32 overflow-y-auto">
-                {reviews.slice(0, 2).map((review) => (
+                {reviews.map((review) => (
                   <div key={review.id} className="text-sm border-b pb-2">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{review.userName}</span>
@@ -110,16 +223,24 @@ export const RestaurantCard = ({
                     <p className="text-gray-600 mt-1 line-clamp-2">{review.comment}</p>
                   </div>
                 ))}
+                {reviews.length === 0 && (
+                  <p className="text-gray-500 text-sm text-center">No reviews yet</p>
+                )}
               </div>
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 text-sm text-gray-500">
-                <ThumbsUp className="w-4 h-4" />
-                <span>{likes} likes</span>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="flex items-center gap-1 text-sm text-gray-500"
+                onClick={handleLikeClick}
+              >
+                <ThumbsUp className={`w-4 h-4 ${isLiked ? 'fill-primary text-primary' : ''}`} />
+                <span>{likesCount} likes</span>
                 <span className="mx-2">•</span>
                 <span>{reviews.length} reviews</span>
-              </div>
+              </Button>
               <Button
                 size="sm"
                 variant="outline"
