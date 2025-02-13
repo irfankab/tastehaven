@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
@@ -31,47 +30,41 @@ const Index = () => {
 
   const fetchRestaurants = async () => {
     try {
-      const { data: restaurantsData, error: restaurantsError } = await supabase
+      const { data: restaurantsWithRatings, error } = await supabase
         .from('restaurants')
         .select(`
           id,
           name,
           cuisine,
           address,
-          image_url
+          image_url,
+          reviews (rating)
         `)
         .limit(6);
 
-      if (restaurantsError) {
-        console.error('Error fetching restaurants:', restaurantsError);
+      if (error) {
+        console.error('Error fetching restaurants:', error);
         return;
       }
 
-      // Fetch average ratings for each restaurant
-      const restaurantsWithRatings = await Promise.all(
-        restaurantsData.map(async (restaurant) => {
-          const { data: reviewsData } = await supabase
-            .from('reviews')
-            .select('rating')
-            .eq('restaurant_id', restaurant.id);
+      const formattedRestaurants = restaurantsWithRatings.map((restaurant) => {
+        const ratings = restaurant.reviews || [];
+        const averageRating = ratings.length > 0
+          ? ratings.reduce((acc: number, review: { rating: number }) => acc + Number(review.rating), 0) / ratings.length
+          : 0;
 
-          const averageRating = reviewsData && reviewsData.length > 0
-            ? reviewsData.reduce((acc, review) => acc + Number(review.rating), 0) / reviewsData.length
-            : 0;
+        return {
+          id: restaurant.id,
+          name: restaurant.name,
+          cuisine: restaurant.cuisine,
+          rating: Number(averageRating.toFixed(1)),
+          imageUrl: restaurant.image_url,
+          priceRange: "$$",
+          address: restaurant.address,
+        };
+      });
 
-          return {
-            id: restaurant.id,
-            name: restaurant.name,
-            cuisine: restaurant.cuisine,
-            rating: Number(averageRating.toFixed(1)),
-            imageUrl: restaurant.image_url,
-            priceRange: "$$",
-            address: restaurant.address,
-          };
-        })
-      );
-
-      setRestaurants(restaurantsWithRatings);
+      setRestaurants(formattedRestaurants);
     } catch (error) {
       console.error('Error in fetchRestaurants:', error);
     } finally {
