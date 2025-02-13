@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
@@ -68,17 +67,16 @@ const Index = () => {
         query = query.eq('price_range', selectedPriceRange);
       }
 
-      // Apply sorting
-      switch (selectedSort) {
-        case "rating":
-          // We'll sort after fetching since rating is calculated from reviews
-          break;
-        case "name":
-          query = query.order('name');
-          break;
-        case "newest":
-          query = query.order('created_at', { ascending: false });
-          break;
+      // Only apply database-level sorting for non-rating sorts
+      if (selectedSort !== "rating") {
+        switch (selectedSort) {
+          case "name":
+            query = query.order('name');
+            break;
+          case "newest":
+            query = query.order('created_at', { ascending: false });
+            break;
+        }
       }
 
       // Apply pagination
@@ -109,7 +107,7 @@ const Index = () => {
         };
       });
 
-      // Sort by rating if selected
+      // Sort by rating if selected (in memory)
       if (selectedSort === "rating") {
         formattedRestaurants.sort((a, b) => b.rating - a.rating);
       }
