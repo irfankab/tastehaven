@@ -51,6 +51,7 @@ const Index = () => {
           address,
           image_url,
           price_range,
+          created_at,
           reviews (rating)
         `);
 
@@ -70,7 +71,7 @@ const Index = () => {
       // Apply sorting
       switch (selectedSort) {
         case "rating":
-          query = query.order('rating', { ascending: false });
+          // We'll sort after fetching since rating is calculated from reviews
           break;
         case "name":
           query = query.order('name');
@@ -107,6 +108,11 @@ const Index = () => {
           address: restaurant.address,
         };
       });
+
+      // Sort by rating if selected
+      if (selectedSort === "rating") {
+        formattedRestaurants.sort((a, b) => b.rating - a.rating);
+      }
 
       setRestaurants(formattedRestaurants);
       setHasMore(restaurantsWithRatings.length === ITEMS_PER_PAGE);
