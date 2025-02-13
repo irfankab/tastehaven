@@ -4,11 +4,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { ReviewForm } from "@/components/restaurants/ReviewForm";
+import { MenuItems } from "@/components/restaurants/MenuItems";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Star, MapPin, ThumbsUp, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ErrorBoundary } from "react-error-boundary";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Review {
   id: string;
@@ -199,55 +201,68 @@ const RestaurantDetails = () => {
                   </div>
                 </div>
 
-                {session ? (
-                  <Button
-                    onClick={() => setIsReviewModalOpen(true)}
-                    className="w-full sm:w-auto mb-6"
-                  >
-                    Write a Review
-                  </Button>
-                ) : (
-                  <p className="text-gray-500 mb-6">Sign in to write a review</p>
-                )}
+                <Tabs defaultValue="menu" className="mt-6">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="menu">Menu</TabsTrigger>
+                    <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="menu" className="mt-6">
+                    <MenuItems restaurantId={restaurant.id} />
+                  </TabsContent>
+                  
+                  <TabsContent value="reviews">
+                    {session ? (
+                      <Button
+                        onClick={() => setIsReviewModalOpen(true)}
+                        className="w-full sm:w-auto mb-6"
+                      >
+                        Write a Review
+                      </Button>
+                    ) : (
+                      <p className="text-gray-500 mb-6">Sign in to write a review</p>
+                    )}
 
-                <div className="mt-8">
-                  <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
-                  {restaurant.reviews.length === 0 ? (
-                    <p className="text-gray-500">No reviews yet. Be the first to review!</p>
-                  ) : (
-                    <div className="space-y-6">
-                      {restaurant.reviews.map((review) => (
-                        <div key={review.id} className="border-b pb-6">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <p className="font-semibold">{review.userName}</p>
-                              <p className="text-sm text-gray-500">{review.date}</p>
+                    <div className="mt-8">
+                      <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
+                      {restaurant.reviews.length === 0 ? (
+                        <p className="text-gray-500">No reviews yet. Be the first to review!</p>
+                      ) : (
+                        <div className="space-y-6">
+                          {restaurant.reviews.map((review) => (
+                            <div key={review.id} className="border-b pb-6">
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <p className="font-semibold">{review.userName}</p>
+                                  <p className="text-sm text-gray-500">{review.date}</p>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                  <span>{review.rating}</span>
+                                </div>
+                              </div>
+                              <p className="text-gray-700 mb-4">{review.comment}</p>
+                              {review.image_url && (
+                                <img
+                                  src={review.image_url}
+                                  alt="Review"
+                                  className="rounded-lg max-h-48 object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              )}
+                              <div className="flex items-center gap-2 mt-4 text-gray-500">
+                                <ThumbsUp className="w-4 h-4" />
+                                <span>{review.likes} likes</span>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                              <span>{review.rating}</span>
-                            </div>
-                          </div>
-                          <p className="text-gray-700 mb-4">{review.comment}</p>
-                          {review.image_url && (
-                            <img
-                              src={review.image_url}
-                              alt="Review"
-                              className="rounded-lg max-h-48 object-cover"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          )}
-                          <div className="flex items-center gap-2 mt-4 text-gray-500">
-                            <ThumbsUp className="w-4 h-4" />
-                            <span>{review.likes} likes</span>
-                          </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  )}
-                </div>
+                  </TabsContent>
+                </Tabs>
               </div>
             </div>
           </div>
