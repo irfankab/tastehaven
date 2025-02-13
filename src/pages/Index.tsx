@@ -1,11 +1,13 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { RestaurantGrid } from "@/components/restaurants/RestaurantGrid";
+import { RestaurantFilters } from "@/components/restaurants/RestaurantFilters";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface Restaurant {
   id: string;
@@ -17,20 +19,30 @@ interface Restaurant {
   address: string;
 }
 
+const ITEMS_PER_PAGE = 6;
+
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [selectedCuisine, setSelectedCuisine] = useState("All");
+  const [selectedPriceRange, setSelectedPriceRange] = useState("All");
+  const [selectedSort, setSelectedSort] = useState("rating");
+  
   const navigate = useNavigate();
   const { toast } = useToast();
+  const debouncedSearch = useDebounce(searchQuery);
 
   useEffect(() => {
     fetchRestaurants();
-  }, []);
+  }, [debouncedSearch, page, selectedCuisine, selectedPriceRange, selectedSort]);
 
   const fetchRestaurants = async () => {
     try {
-      const { data: restaurantsWithRatings, error } = await supabase
+      setIsLoading(true);
+      let query = supabase
         .from('restaurants')
         .select(`
           id,
@@ -38,9 +50,41 @@ const Index = () => {
           cuisine,
           address,
           image_url,
+          price_range,
           reviews (rating)
-        `)
-        .limit(6);
+        `);
+
+      // Apply filters
+      if (debouncedSearch) {
+        query = query.ilike('name', `%${debouncedSearch}%`);
+      }
+      
+      if (selectedCuisine !== "All") {
+        query = query.eq('cuisine', selectedCuisine);
+      }
+      
+      if (selectedPriceRange !== "All") {
+        query = query.eq('price_range', selectedPriceRange);
+      }
+
+      // Apply sorting
+      switch (selectedSort) {
+        case "rating":
+          query = query.order('rating', { ascending: false });
+          break;
+        case "name":
+          query = query.order('name');
+          break;
+        case "newest":
+          query = query.order('created_at', { ascending: false });
+          break;
+      }
+
+      // Apply pagination
+      query = query
+        .range((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE - 1);
+
+      const { data: restaurantsWithRatings, error } = await query;
 
       if (error) {
         console.error('Error fetching restaurants:', error);
@@ -59,12 +103,13 @@ const Index = () => {
           cuisine: restaurant.cuisine,
           rating: Number(averageRating.toFixed(1)),
           imageUrl: restaurant.image_url,
-          priceRange: "$$",
+          priceRange: restaurant.price_range,
           address: restaurant.address,
         };
       });
 
       setRestaurants(formattedRestaurants);
+      setHasMore(restaurantsWithRatings.length === ITEMS_PER_PAGE);
     } catch (error) {
       console.error('Error in fetchRestaurants:', error);
     } finally {
@@ -86,9 +131,11 @@ const Index = () => {
     }
   };
 
-  const filteredRestaurants = restaurants.filter((restaurant) =>
-    restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const loadMore = () => {
+    if (hasMore) {
+      setPage(prev => prev + 1);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -139,23 +186,37 @@ const Index = () => {
             </p>
           </div>
 
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="lg:col-span-1">
+              <RestaurantFilters
+                selectedCuisine={selectedCuisine}
+                setSelectedCuisine={setSelectedCuisine}
+                selectedPriceRange={selectedPriceRange}
+                setSelectedPriceRange={setSelectedPriceRange}
+                selectedSort={selectedSort}
+                setSelectedSort={setSelectedSort}
+              />
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredRestaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.id} {...restaurant} reviews={[]} likes={0} />
-              ))}
-            </div>
-          )}
 
-          {!isLoading && filteredRestaurants.length === 0 && (
-            <div className="text-center py-12 text-gray-500 bg-white rounded-lg shadow-sm">
-              No places found matching your search.
+            <div className="lg:col-span-3">
+              <RestaurantGrid
+                restaurants={restaurants}
+                isLoading={isLoading}
+              />
+              
+              {hasMore && !isLoading && (
+                <div className="mt-8 text-center">
+                  <Button
+                    onClick={loadMore}
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                  >
+                    Load More
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </main>
 
