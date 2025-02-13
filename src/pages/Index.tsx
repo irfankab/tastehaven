@@ -40,7 +40,7 @@ const Index = () => {
           address,
           image_url
         `)
-        .limit(6); // Only show 6 restaurants on the home page
+        .limit(6);
 
       if (restaurantsError) {
         console.error('Error fetching restaurants:', restaurantsError);
@@ -65,7 +65,7 @@ const Index = () => {
             cuisine: restaurant.cuisine,
             rating: Number(averageRating.toFixed(1)),
             imageUrl: restaurant.image_url,
-            priceRange: "$$", // This could be added to the restaurants table in the future
+            priceRange: "$$",
             address: restaurant.address,
           };
         })
@@ -84,7 +84,7 @@ const Index = () => {
     if (!session) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to explore restaurants",
+        description: "Please sign in to explore reviews",
         variant: "default",
       });
       navigate('/auth');
@@ -110,10 +110,10 @@ const Index = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="py-20 text-center">
               <h1 className="text-5xl font-bold text-white mb-6 animate-fade-in tracking-tight drop-shadow-lg">
-                Discover Your Next Favorite Spot
+                Discover Local Reviews
               </h1>
               <p className="text-xl text-white max-w-2xl mx-auto mb-8 animate-fade-in delay-100 drop-shadow-md">
-                Join our community of food lovers and explore the best dining experiences in your area
+                Join our community and explore honest reviews from people in Bangladesh
               </p>
               <div className="space-x-4">
                 <Button 
@@ -139,10 +139,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Popular Restaurants
+              Popular Places
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Discover highly-rated restaurants with authentic reviews from our community
+              Discover highly-rated places with authentic reviews from our local community
             </p>
           </div>
 
@@ -160,7 +160,7 @@ const Index = () => {
 
           {!isLoading && filteredRestaurants.length === 0 && (
             <div className="text-center py-12 text-gray-500 bg-white rounded-lg shadow-sm">
-              No restaurants found matching your search.
+              No places found matching your search.
             </div>
           )}
         </div>
@@ -170,22 +170,22 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">TasteHaven</h3>
-              <p className="text-gray-400">Connecting food lovers with great restaurants</p>
+              <h3 className="text-xl font-bold mb-4">REVBD</h3>
+              <p className="text-gray-400">Connecting people with great local businesses</p>
             </div>
             <div>
               <h4 className="text-lg font-semibold mb-4">Explore</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Popular Restaurants</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Popular Places</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Latest Reviews</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Food Categories</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Categories</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-lg font-semibold mb-4">Join Us</h4>
               <ul className="space-y-2">
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Write Reviews</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Add Restaurant</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Add Business</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Create Account</a></li>
               </ul>
             </div>
