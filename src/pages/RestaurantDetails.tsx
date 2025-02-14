@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
@@ -20,6 +19,9 @@ interface Review {
   date: string;
   image_url?: string;
   likes: number;
+  user: {
+    username: string;
+  };
 }
 
 interface Restaurant {
@@ -75,7 +77,9 @@ const RestaurantDetails = () => {
             comment,
             created_at,
             image_url,
-            profiles (username)
+            profiles (
+              username
+            )
           `)
           .eq("restaurant_id", id);
 
@@ -88,7 +92,10 @@ const RestaurantDetails = () => {
           comment: review.comment,
           date: new Date(review.created_at).toLocaleDateString(),
           image_url: review.image_url,
-          likes: 0
+          likes: 0,
+          user: {
+            username: review.profiles?.username || "Anonymous"
+          }
         }));
 
         const averageRating = formattedReviews.length > 0
@@ -233,7 +240,7 @@ const RestaurantDetails = () => {
                             <div key={review.id} className="border-b pb-6">
                               <div className="flex justify-between items-start mb-2">
                                 <div>
-                                  <p className="font-semibold">{review.userName}</p>
+                                  <p className="font-semibold text-primary">@{review.user.username}</p>
                                   <p className="text-sm text-gray-500">{review.date}</p>
                                 </div>
                                 <div className="flex items-center gap-1">
