@@ -144,7 +144,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="relative">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000')] bg-cover bg-center">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000')] bg-cover bg-center bg-fixed">
           <div className="absolute inset-0 bg-black/75"></div>
         </div>
         
@@ -153,23 +153,23 @@ const Index = () => {
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="py-20 text-center">
-              <h1 className="text-5xl font-bold text-white mb-6 animate-fade-in tracking-tight drop-shadow-lg">
+              <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6 animate-fade-in tracking-tight drop-shadow-lg">
                 Discover Local Reviews
               </h1>
-              <p className="text-xl text-white max-w-2xl mx-auto mb-8 animate-fade-in delay-100 drop-shadow-md">
+              <p className="text-lg sm:text-xl text-white max-w-2xl mx-auto mb-8 animate-fade-in delay-100 drop-shadow-md">
                 Join our community and explore honest reviews from people in Bangladesh
               </p>
-              <div className="space-x-4">
+              <div className="space-y-4 sm:space-y-0 sm:space-x-4">
                 <Button 
                   onClick={handleExploreClick}
-                  className="bg-primary text-white px-8 py-6 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-xl animate-fade-in delay-200"
+                  className="w-full sm:w-auto bg-primary text-white px-8 py-6 rounded-full font-semibold hover:bg-red-700 transition-all duration-300 shadow-xl animate-fade-in delay-200"
                 >
                   Start Exploring
                 </Button>
                 <Button 
                   variant="outline"
                   onClick={() => navigate('/auth')}
-                  className="px-8 py-6 rounded-full font-semibold bg-white/10 text-white hover:bg-white/20 transition-all duration-300 shadow-xl animate-fade-in delay-300"
+                  className="w-full sm:w-auto px-8 py-6 rounded-full font-semibold bg-white/10 text-white hover:bg-white/20 transition-all duration-300 shadow-xl animate-fade-in delay-300"
                 >
                   Sign In
                 </Button>
@@ -179,7 +179,7 @@ const Index = () => {
         </div>
       </div>
 
-      <main className="relative bg-gray-50">
+      <main className="relative bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -192,14 +192,16 @@ const Index = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-1">
-              <RestaurantFilters
-                selectedCuisine={selectedCuisine}
-                setSelectedCuisine={setSelectedCuisine}
-                selectedPriceRange={selectedPriceRange}
-                setSelectedPriceRange={setSelectedPriceRange}
-                selectedSort={selectedSort}
-                setSelectedSort={setSelectedSort}
-              />
+              <div className="sticky top-20">
+                <RestaurantFilters
+                  selectedCuisine={selectedCuisine}
+                  setSelectedCuisine={setSelectedCuisine}
+                  selectedPriceRange={selectedPriceRange}
+                  setSelectedPriceRange={setSelectedPriceRange}
+                  selectedSort={selectedSort}
+                  setSelectedSort={setSelectedSort}
+                />
+              </div>
             </div>
 
             <div className="lg:col-span-3">
@@ -213,7 +215,7 @@ const Index = () => {
                   <Button
                     onClick={loadMore}
                     variant="outline"
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto hover:bg-primary hover:text-white transition-colors"
                   >
                     Load More
                   </Button>
@@ -224,9 +226,9 @@ const Index = () => {
         </div>
       </main>
 
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gradient-to-b from-gray-900 to-black text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
               <h3 className="text-xl font-bold mb-4">REVBD</h3>
               <p className="text-gray-400">Connecting people with great local businesses</p>
