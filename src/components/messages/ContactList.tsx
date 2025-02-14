@@ -1,5 +1,9 @@
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 interface User {
   id: string;
@@ -15,18 +19,33 @@ interface ContactListProps {
 }
 
 export const ContactList = ({ users, selectedUser, onSelectUser }: ContactListProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredUsers = users.filter(user => 
+    user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <Card className="md:col-span-1 p-4">
-      <h2 className="font-semibold mb-4">Contacts</h2>
-      <ScrollArea className="h-[500px]">
+    <Card className="md:col-span-1 p-4 h-[600px] flex flex-col">
+      <div className="mb-4 relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <Input
+          placeholder="Search contacts..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+      <ScrollArea className="flex-1 -mx-2 px-2">
         <div className="space-y-2">
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <button
               key={user.id}
               onClick={() => onSelectUser(user.id)}
-              className={`w-full text-left p-3 rounded-lg transition-colors ${
+              className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
                 selectedUser === user.id 
-                  ? "bg-gray-100 hover:bg-gray-200" 
+                  ? "bg-primary/10 hover:bg-primary/20" 
                   : "hover:bg-gray-50"
               }`}
             >
@@ -35,20 +54,27 @@ export const ContactList = ({ users, selectedUser, onSelectUser }: ContactListPr
                   <img 
                     src={user.avatar_url} 
                     alt={user.username || 'User'} 
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold shadow-sm">
                     {(user.username || 'A')[0].toUpperCase()}
                   </div>
                 )}
                 <div>
-                  <p className="font-medium">{user.username || 'Anonymous'}</p>
-                  <p className="text-sm text-gray-500">{user.email}</p>
+                  <p className={`font-medium ${selectedUser === user.id ? 'text-primary' : 'text-gray-900'}`}>
+                    {user.username || 'Anonymous'}
+                  </p>
+                  <p className="text-sm text-gray-500 truncate">{user.email}</p>
                 </div>
               </div>
             </button>
           ))}
+          {filteredUsers.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              No contacts found
+            </div>
+          )}
         </div>
       </ScrollArea>
     </Card>
