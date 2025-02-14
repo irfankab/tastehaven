@@ -107,49 +107,65 @@ const Messages = () => {
       }
     };
 
+    // Initial fetch
+    fetchMessages();
+
+    // Set up realtime subscription
     const setupRealtimeSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       console.log('Setting up realtime subscription for currentUser:', user.id, 'selectedUser:', selectedUser);
 
-      const channel = supabase
-        .channel('messages')
+      return supabase
+        .channel('messages_channel')
         .on(
           'postgres_changes',
           {
-            event: '*',
+            event: 'INSERT',
             schema: 'public',
             table: 'messages',
             filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${user.id}))`,
           },
-          (payload) => {
-            console.log('Received realtime update:', payload);
-            fetchMessages(); // Refresh messages when we receive an update
+          async (payload) => {
+            console.log('Received new message:', payload);
+            // Fetch the complete message with sender information
+            const { data, error } = await supabase
+              .from("messages")
+              .select(`
+                id,
+                content,
+                sender_id,
+                receiver_id,
+                created_at,
+                sender:profiles!messages_sender_id_fkey (
+                  username,
+                  avatar_url
+                )
+              `)
+              .eq('id', payload.new.id)
+              .single();
+
+            if (!error && data) {
+              setMessages(prev => [...prev, data as Message]);
+            }
           }
         )
         .subscribe((status) => {
           console.log('Subscription status:', status);
         });
-
-      return channel;
     };
 
-    // Initial fetch
-    fetchMessages();
-
-    // Setup subscription
-    let channel: ReturnType<typeof supabase.channel>;
-    setupRealtimeSubscription().then(ch => {
-      channel = ch;
-    });
+    const subscription = setupRealtimeSubscription();
 
     // Cleanup subscription
     return () => {
-      if (channel) {
-        console.log('Unsubscribing from channel');
-        channel.unsubscribe();
-      }
+      subscription.then(channel => {
+        if (channel) {
+          console.log('Unsubscribing from messages channel');
+          supabase.removeChannel(channel);
+        }
+      });
     };
   }, [selectedUser, toast]);
 
