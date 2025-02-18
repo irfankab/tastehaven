@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
@@ -169,7 +170,7 @@ const RestaurantDetails = () => {
     <ErrorBoundary fallback={<div>Something went wrong. Please try again.</div>}>
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-8 mt-16">
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="relative h-64">
@@ -218,56 +219,59 @@ const RestaurantDetails = () => {
                     <MenuItems restaurantId={restaurant.id} />
                   </TabsContent>
                   
-                  <TabsContent value="reviews">
-                    {session ? (
-                      <Button
-                        onClick={() => setIsReviewModalOpen(true)}
-                        className="w-full sm:w-auto mb-6"
-                      >
-                        Write a Review
-                      </Button>
-                    ) : (
-                      <p className="text-gray-500 mb-6">Sign in to write a review</p>
-                    )}
-
-                    <div className="mt-8">
-                      <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
-                      {restaurant.reviews.length === 0 ? (
-                        <p className="text-gray-500">No reviews yet. Be the first to review!</p>
+                  <TabsContent value="reviews" className="mt-6">
+                    <div className="mb-6">
+                      {session ? (
+                        <Button
+                          onClick={() => setIsReviewModalOpen(true)}
+                          className="w-full sm:w-auto bg-primary hover:bg-red-600 text-white shadow-lg"
+                        >
+                          Write a Review
+                        </Button>
                       ) : (
-                        <div className="space-y-6">
-                          {restaurant.reviews.map((review) => (
-                            <div key={review.id} className="border-b pb-6">
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <p className="font-semibold text-primary">@{review.user.username}</p>
-                                  <p className="text-sm text-gray-500">{review.date}</p>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                  <span>{review.rating}</span>
-                                </div>
-                              </div>
-                              <p className="text-gray-700 mb-4">{review.comment}</p>
-                              {review.image_url && (
-                                <img
-                                  src={review.image_url}
-                                  alt="Review"
-                                  className="rounded-lg max-h-48 object-cover"
-                                  onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                  }}
-                                />
-                              )}
-                              <div className="flex items-center gap-2 mt-4 text-gray-500">
-                                <ThumbsUp className="w-4 h-4" />
-                                <span>{review.likes} likes</span>
-                              </div>
-                            </div>
-                          ))}
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <p className="text-gray-600 text-center">Please <a href="/auth" className="text-primary hover:text-red-600">sign in</a> to write a review</p>
                         </div>
                       )}
                     </div>
+
+                    {restaurant.reviews.length === 0 ? (
+                      <div className="text-center py-8 bg-gray-50 rounded-lg">
+                        <p className="text-gray-500">No reviews yet. Be the first to review!</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {restaurant.reviews.map((review) => (
+                          <div key={review.id} className="border-b pb-6">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <p className="font-semibold text-primary">@{review.user.username}</p>
+                                <p className="text-sm text-gray-500">{review.date}</p>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                <span>{review.rating}</span>
+                              </div>
+                            </div>
+                            <p className="text-gray-700 mb-4">{review.comment}</p>
+                            {review.image_url && (
+                              <img
+                                src={review.image_url}
+                                alt="Review"
+                                className="rounded-lg max-h-48 object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                            )}
+                            <div className="flex items-center gap-2 mt-4 text-gray-500">
+                              <ThumbsUp className="w-4 h-4" />
+                              <span>{review.likes} likes</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </TabsContent>
                 </Tabs>
               </div>
