@@ -1,12 +1,14 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/restaurants/SearchBar";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Menu, X } from "lucide-react";
+import { Session } from '@supabase/supabase-js';
 
 export const Header = ({ onSearch }: { onSearch?: (query: string) => void }) => {
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
